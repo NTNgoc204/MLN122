@@ -13,122 +13,122 @@ import {
 const QUESTION_POOL = [
   {
     id: 'q01',
-    prompt: 'Ban tao ra 500k nhung chi nhan 300k. Phan con lai goi la gi?',
-    options: ['Tien thuong', 'Gia tri thang du', 'Chi phi van hanh'],
+    prompt: 'Bạn tạo ra 500k nhưng chỉ nhận 300k. Phần còn lại gọi là gì?',
+    options: ['Tiền thưởng', 'Giá trị thặng dư', 'Chi phí vận hành'],
     correctIndex: 1,
   },
   {
     id: 'q02',
-    prompt: 'Theo Marx, nguon goc gia tri moi chu yeu den tu dau?',
-    options: ['Lao dong song', 'May moc tu dong', 'Quang cao'],
+    prompt: 'Theo Marx, nguồn gốc giá trị mới chủ yếu đến từ đâu?',
+    options: ['Lao động sống', 'Máy móc tự động', 'Quảng cáo'],
     correctIndex: 0,
   },
   {
     id: 'q03',
-    prompt: 'Loi nhuan trong thi truong la bieu hien cua cai gi?',
-    options: ['Gia tri thang du', 'Tien thuong co dinh', 'Tien thue'],
+    prompt: 'Lợi nhuận trong thị trường là biểu hiện của cái gì?',
+    options: ['Giá trị thặng dư', 'Tiền thưởng cố định', 'Tiền thuê'],
     correctIndex: 0,
   },
   {
     id: 'q04',
-    prompt: 'Tang gio lam de tao them gia tri thang du la dang nao?',
-    options: ['Thang du tuyet doi', 'Thang du tuong doi', 'Khong lien quan'],
+    prompt: 'Tăng giờ làm để tạo thêm giá trị thặng dư là dạng nào?',
+    options: ['Thặng dư tuyệt đối', 'Thặng dư tương đối', 'Không liên quan'],
     correctIndex: 0,
   },
   {
     id: 'q05',
-    prompt: 'Tang nang suat de rut ngan lao dong tat yeu la dang nao?',
-    options: ['Thang du tuong doi', 'Thang du tuyet doi', 'Chi la marketing'],
+    prompt: 'Tăng năng suất để rút ngắn lao động tất yếu là dạng nào?',
+    options: ['Thặng dư tương đối', 'Thặng dư tuyệt đối', 'Chỉ là marketing'],
     correctIndex: 0,
   },
   {
     id: 'q06',
-    prompt: 'Trong nen kinh te so, ai quyet dinh hien thi gia va phan bo don?',
-    options: ['Nguoi lao dong', 'Nen tang va thuat toan', 'Nguoi mua'],
+    prompt: 'Trong nền kinh tế số, ai quyết định hiển thị giá và phân bổ đơn?',
+    options: ['Người lao động', 'Nền tảng và thuật toán', 'Người mua'],
     correctIndex: 1,
   },
   {
     id: 'q07',
-    prompt: 'Tai xe Grab tao doanh thu, nhung bi tru chiet khau. Dieu nay cho thay dieu gi?',
-    options: ['Phan chia gia tri khong deu', 'Tang thu nhap dong deu', 'Khong co gia tri thang du'],
+    prompt: 'Tài xế Grab tạo doanh thu, nhưng bị trừ chiết khấu. Điều này cho thấy điều gì?',
+    options: ['Phân chia giá trị không đều', 'Tăng thu nhập đồng đều', 'Không có giá trị thặng dư'],
     correctIndex: 0,
   },
   {
     id: 'q08',
-    prompt: 'Freelancer bi thu phi trung gian tren moi hop dong. Phan phi do thuong di ve dau?',
-    options: ['Nen tang', 'Khach hang', 'Nha nuoc'],
+    prompt: 'Freelancer bị thu phí trung gian trên mỗi hợp đồng. Phần phí đó thường đi về đâu?',
+    options: ['Nền tảng', 'Khách hàng', 'Nhà nước'],
     correctIndex: 0,
   },
   {
     id: 'q09',
-    prompt: 'Cong nghe co the lam gi trong qua trinh tao gia tri?',
-    options: ['Tang toc do va nang suat lao dong', 'Tu tao gia tri moi khong can nguoi', 'Xoa bo hoan toan lao dong'],
+    prompt: 'Công nghệ có thể làm gì trong quá trình tạo giá trị?',
+    options: ['Tăng tốc độ và năng suất lao động', 'Tự tạo giá trị mới không cần người', 'Xóa bỏ hoàn toàn lao động'],
     correctIndex: 0,
   },
   {
     id: 'q10',
-    prompt: 'Nguoi lao dong nhin thay thu nhap tang nhe, cong ty tang nhanh hon. Ai huong loi nhieu hon?',
-    options: ['Nguoi lao dong', 'Cong ty', 'Hai ben bang nhau'],
+    prompt: 'Người lao động nhìn thấy thu nhập tăng nhẹ, công ty tăng nhanh hơn. Ai hưởng lợi nhiều hơn?',
+    options: ['Người lao động', 'Công ty', 'Hai bên bằng nhau'],
     correctIndex: 1,
   },
   {
     id: 'q11',
-    prompt: 'Du lieu va thuat toan trong nen tang so dong vai tro gi?',
-    options: ['Cong cu kiem soat phan phoi gia tri', 'Chi de trang tri giao dien', 'Khong co tac dung'],
+    prompt: 'Dữ liệu và thuật toán trong nền tảng số đóng vai trò gì?',
+    options: ['Công cụ kiểm soát phân phối giá trị', 'Chỉ để trang trí giao diện', 'Không có tác dụng'],
     correctIndex: 0,
   },
   {
     id: 'q12',
-    prompt: 'Neu luong giu nguyen nhung nang suat tang, phan gia tri chenhlech thuong thuoc ve ai?',
-    options: ['Chu nen tang/doanh nghiep', 'Nguoi lao dong giu toan bo', 'Khong thuoc ve ai'],
+    prompt: 'Nếu lương giữ nguyên nhưng năng suất tăng, phần giá trị chênh lệch thường thuộc về ai?',
+    options: ['Chủ nền tảng/doanh nghiệp', 'Người lao động giữ toàn bộ', 'Không thuộc về ai'],
     correctIndex: 0,
   },
   {
     id: 'q13',
-    prompt: 'Nguoi lao dong khong lam viec thi gia tri moi co duoc tao ra khong?',
-    options: ['Khong', 'Co vi may tu tao', 'Co vi quang cao'],
+    prompt: 'Người lao động không làm việc thì giá trị mới có được tạo ra không?',
+    options: ['Không', 'Có vì máy tự tạo', 'Có vì quảng cáo'],
     correctIndex: 0,
   },
   {
     id: 'q14',
-    prompt: 'Tang gio online de nhan them don lien quan den co che nao?',
-    options: ['Mo rong lao dong de tao thang du', 'Giam lao dong tat yeu', 'Khong lien quan'],
+    prompt: 'Tăng giờ online để nhận thêm đơn liên quan đến cơ chế nào?',
+    options: ['Mở rộng lao động để tạo thặng dư', 'Giảm lao động tất yếu', 'Không liên quan'],
     correctIndex: 0,
   },
   {
     id: 'q15',
-    prompt: 'Tren san thuong mai dien tu, nguoi ban mua quang cao de duoc hien thi tot hon. Ai dat luat cho viec nay?',
-    options: ['Nen tang', 'Nguoi ban', 'Nguoi mua'],
+    prompt: 'Trên sàn thương mại điện tử, người bán mua quảng cáo để được hiển thị tốt hơn. Ai đặt luật cho việc này?',
+    options: ['Nền tảng', 'Người bán', 'Người mua'],
     correctIndex: 0,
   },
   {
     id: 'q16',
-    prompt: 'Cau nao dung nhat voi chu de gia tri thang du trong kinh te so?',
-    options: ['Nguoi tao gia tri luon giu het gia tri', 'Nguoi tao gia tri khong chac giu phan lon', 'Gia tri khong can lao dong'],
+    prompt: 'Câu nào đúng nhất với chủ đề giá trị thặng dư trong kinh tế số?',
+    options: ['Người tạo giá trị luôn giữ hết giá trị', 'Người tạo giá trị không chắc giữ phần lớn', 'Giá trị không cần lao động'],
     correctIndex: 1,
   },
   {
     id: 'q17',
-    prompt: 'Neu cong ty thu phi tren tung giao dich, dong tien do duoc ghi nhan thanh gi?',
-    options: ['Doanh thu cua cong ty', 'Luong cua tai xe', 'Ho tro cua khach'],
+    prompt: 'Nếu công ty thu phí trên từng giao dịch, dòng tiền đó được ghi nhận thành gì?',
+    options: ['Doanh thu của công ty', 'Lương của tài xế', 'Hỗ trợ của khách'],
     correctIndex: 0,
   },
   {
     id: 'q18',
-    prompt: 'Khi nguoi lao dong khong nam quyen dat gia, ho thieu dieu gi?',
-    options: ['Quyen luc thuong luong', 'Thoi gian online', 'So luong don'],
+    prompt: 'Khi người lao động không nắm quyền đặt giá, họ thiếu điều gì?',
+    options: ['Quyền lực thương lượng', 'Thời gian online', 'Số lượng đơn'],
     correctIndex: 0,
   },
   {
     id: 'q19',
-    prompt: 'Muc tieu cua game Money Flow la gi?',
-    options: ['Chi de giai tri', 'Lam ro dong tien va ai giu tien', 'Do toc do bam nut'],
+    prompt: 'Mục tiêu của game Dòng tiền là gì?',
+    options: ['Chỉ để giải trí', 'Làm rõ dòng tiền và ai giữ tiền', 'Đo tốc độ bấm nút'],
     correctIndex: 1,
   },
   {
     id: 'q20',
-    prompt: 'Sau cung, thong diep cot loi cua chu de nay la gi?',
-    options: ['Tien luon chia deu', 'Gia tri co the duoc tao ra boi nguoi lao dong nhung bi giu lai boi he thong', 'Cong nghe xoa bo moi bat binh dang'],
+    prompt: 'Sau cùng, thông điệp cốt lõi của chủ đề này là gì?',
+    options: ['Tiền luôn chia đều', 'Giá trị có thể được tạo ra bởi người lao động nhưng bị giữ lại bởi hệ thống', 'Công nghệ xóa bỏ mọi bất bình đẳng'],
     correctIndex: 1,
   },
 ]
@@ -222,7 +222,7 @@ function GamePage() {
 
     setFeedback({
       type: isCorrect ? 'success' : 'error',
-      text: isCorrect ? 'Chinh xac!' : 'Sai roi!',
+      text: isCorrect ? 'Chính xác!' : 'Sai rồi!',
       playerDelta,
       companyDelta: COMPANY_TAKE_PER_ROUND,
     })
@@ -246,17 +246,17 @@ function GamePage() {
   return (
     <section className="animate-fade-up animate-fade-up-delay-1 w-full px-1 sm:px-2">
       <header className="mb-8 text-center">
-        <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-rose-700 uppercase">{'Money Flow'}</p>
-        <h1 className="text-4xl font-semibold text-slate-800 sm:text-5xl">{'Ai giu tien?'}</h1>
+        <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-rose-700 uppercase">{'Dòng tiền'}</p>
+        <h1 className="text-4xl font-semibold text-slate-800 sm:text-5xl">{'Ai giữ tiền?'}</h1>
         <p className="mx-auto mt-2 max-w-3xl text-lg text-slate-600 sm:text-xl">
-          {'Tra loi 10 cau hoi ngau nhien de xem dong tien cua ban va cong ty chay nhu the nao.'}
+          {'Trả lời 10 câu hỏi ngẫu nhiên để xem dòng tiền của bạn và công ty chạy như thế nào.'}
         </p>
       </header>
 
       <article className="rounded-[30px] border border-white/70 bg-white/70 p-5 shadow-[0_18px_40px_rgba(13,55,89,0.12)] backdrop-blur-md sm:p-7">
         <div className="mb-6 grid gap-3 md:grid-cols-3">
           <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Your Money'}</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Tiền của bạn'}</p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-emerald-700">
               <BriefcaseBusiness className="h-5 w-5" />
               {formatMoney(money)}
@@ -264,7 +264,7 @@ function GamePage() {
           </div>
 
           <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Company'}</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Công ty'}</p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-rose-700">
               <Building2 className="h-5 w-5" />
               {formatMoney(companyMoney)}
@@ -272,7 +272,7 @@ function GamePage() {
           </div>
 
           <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Question'}</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Câu hỏi'}</p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-indigo-700">
               <TrendingUp className="h-5 w-5" />
               {gameStarted ? `${isFinished ? QUESTIONS_PER_GAME : currentIndex + 1}/${QUESTIONS_PER_GAME}` : `0/${QUESTIONS_PER_GAME}`}
@@ -301,7 +301,7 @@ function GamePage() {
                 {`${flash.playerDelta >= 0 ? '+' : ''}${flash.playerDelta}k`}
               </span>
               <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">
-                {`Company +${flash.companyDelta}k`}
+                {`Công ty +${flash.companyDelta}k`}
               </span>
             </MotionDiv>
           )}
@@ -310,9 +310,9 @@ function GamePage() {
         <main className="rounded-2xl bg-slate-50/80 p-5 sm:p-6">
           {!gameStarted && (
             <section className="text-center">
-              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{'Ban la nguoi lao dong trong nen kinh te so'}</h2>
+              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{'Bạn là người lao động trong nền kinh tế số'}</h2>
               <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-                {'Game co 20 cau hoi trong kho. Moi lan choi se rut ngau nhien 10 cau. Muc tieu la kiem tien, nhung cong ty luon lay phan tram moi vong.'}
+                {'Game có 20 câu hỏi trong kho. Mỗi lần chơi sẽ rút ngẫu nhiên 10 câu. Mục tiêu là kiếm tiền, nhưng công ty luôn lấy phần trăm mỗi vòng.'}
               </p>
               <button
                 type="button"
@@ -320,14 +320,14 @@ function GamePage() {
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
               >
                 <Play className="h-4 w-4" />
-                {'Bat dau lam viec'}
+                {'Bắt đầu làm việc'}
               </button>
             </section>
           )}
 
           {gameStarted && !isFinished && currentQuestion && (
             <section>
-              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{`Cau ${currentIndex + 1}`}</h2>
+              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{`Câu ${currentIndex + 1}`}</h2>
               <p className="mt-2 text-lg leading-relaxed text-slate-700">{currentQuestion.prompt}</p>
 
               <div className="mt-4 grid gap-3">
@@ -357,7 +357,7 @@ function GamePage() {
                       {feedback.text}
                     </p>
                     <p className="mt-1 text-sm">
-                      {`Ban ${feedback.playerDelta >= 0 ? '+' : ''}${feedback.playerDelta}k | Company +${feedback.companyDelta}k`}
+                      {`Bạn ${feedback.playerDelta >= 0 ? '+' : ''}${feedback.playerDelta}k | Công ty +${feedback.companyDelta}k`}
                     </p>
                   </MotionSection>
                 )}
@@ -369,7 +369,7 @@ function GamePage() {
                   onClick={handleNext}
                   className="mt-5 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
                 >
-                  {'Cau tiep theo'}
+                  {'Câu tiếp theo'}
                 </button>
               )}
             </section>
@@ -377,18 +377,18 @@ function GamePage() {
 
           {isFinished && (
             <section className="text-center">
-              <h2 className="text-3xl font-semibold text-slate-800">{'Hoan thanh 10 cau hoi'}</h2>
+              <h2 className="text-3xl font-semibold text-slate-800">{'Hoàn thành 10 câu hỏi'}</h2>
               <p className="mt-3 text-base text-slate-600 sm:text-lg">
-                {'Ban da tra loi xong 10 cau ngau nhien tu ngan hang 20 cau hoi.'}
+                {'Bạn đã trả lời xong 10 câu ngẫu nhiên từ ngân hàng 20 câu hỏi.'}
               </p>
 
               <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
                 <div className="rounded-xl bg-emerald-100/90 px-4 py-4 text-left">
-                  <p className="text-sm font-semibold uppercase text-emerald-700">{'Ban giu'}</p>
+                  <p className="text-sm font-semibold uppercase text-emerald-700">{'Bạn giữ'}</p>
                   <p className="mt-1 text-3xl font-semibold text-emerald-800">{formatMoney(money)}</p>
                 </div>
                 <div className="rounded-xl bg-rose-100/90 px-4 py-4 text-left">
-                  <p className="text-sm font-semibold uppercase text-rose-700">{'Cong ty giu'}</p>
+                  <p className="text-sm font-semibold uppercase text-rose-700">{'Công ty giữ'}</p>
                   <p className="mt-1 text-3xl font-semibold text-rose-800">{formatMoney(companyMoney)}</p>
                 </div>
               </div>
@@ -396,11 +396,11 @@ function GamePage() {
               <div className="mx-auto mt-5 h-3 w-full max-w-3xl overflow-hidden rounded-full bg-slate-200">
                 <div className="h-full bg-rose-500" style={{ width: `${companyShare}%` }} />
               </div>
-              <p className="mt-2 text-sm font-semibold text-slate-600">{`Cong ty dang nam ${companyShare}% tong dong tien.`}</p>
+              <p className="mt-2 text-sm font-semibold text-slate-600">{`Công ty đang nắm ${companyShare}% tổng dòng tiền.`}</p>
 
               <div className="mx-auto mt-5 grid max-w-3xl gap-4 sm:grid-cols-2">
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
-                  <p className="text-sm text-slate-500">{'Dung'}</p>
+                  <p className="text-sm text-slate-500">{'Đúng'}</p>
                   <p className="text-2xl font-semibold text-emerald-700">{correctCount}</p>
                 </div>
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
@@ -410,7 +410,7 @@ function GamePage() {
               </div>
 
               <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-slate-800">
-                {'Ban tao ra gia tri... nhung ban khong giu phan lon gia tri do.'}
+                {'Bạn tạo ra giá trị... nhưng bạn không giữ phần lớn giá trị đó.'}
               </p>
 
               <button
@@ -419,7 +419,7 @@ function GamePage() {
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
               >
                 <RotateCcw className="h-4 w-4" />
-                {'Choi lai'}
+                {'Chơi lại'}
               </button>
             </section>
           )}
