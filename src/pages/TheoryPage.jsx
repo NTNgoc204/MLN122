@@ -255,6 +255,13 @@ function TheoryPage() {
   }
 
   const isCorrectPosition = (challenge, index) => challenge.id === expectedChallengeIds[index]
+  const sequentiallyCorrectByIndex = challengeOrder.reduce((result, challenge, index) => {
+    const currentCorrect = isCorrectPosition(challenge, index)
+    const previousSequentiallyCorrect = index === 0 ? true : result[index - 1]
+
+    result.push(currentCorrect && previousSequentiallyCorrect)
+    return result
+  }, [])
   const isChallengeSolved = challengeOrder.every((challenge, index) => isCorrectPosition(challenge, index))
 
   return (
@@ -279,7 +286,7 @@ function TheoryPage() {
         viewport={{ once: true, amount: 0.2 }}
         variants={motionVariant}
         transition={{ duration: 0.55, ease: 'easeOut' }}
-        className="relative mb-10 overflow-hidden rounded-[34px] bg-gradient-to-br from-emerald-50 via-slate-50 to-sky-50 p-4 shadow-[0_20px_50px_rgba(15,42,66,0.14)] sm:p-7"
+        className="relative mb-10 overflow-hidden rounded-[34px] bg-linear-to-br from-emerald-50 via-slate-50 to-sky-50 p-4 shadow-[0_20px_50px_rgba(15,42,66,0.14)] sm:p-7"
       >
         <div className="pointer-events-none absolute -left-12 -top-12 h-44 w-44 rounded-full bg-emerald-200/45 blur-3xl" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-10 -right-8 h-48 w-48 rounded-full bg-sky-200/50 blur-3xl" aria-hidden="true" />
@@ -319,10 +326,10 @@ function TheoryPage() {
               transition={{ duration: 0.55, delay: index * 0.08, ease: 'easeOut' }}
               className="group relative overflow-hidden rounded-[30px] bg-white/82 p-5 shadow-[0_14px_32px_rgba(13,55,89,0.11)] backdrop-blur-md sm:p-6"
             >
-              <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-gradient-to-r ${section.glow}`} aria-hidden="true" />
+              <div className={`pointer-events-none absolute inset-x-0 top-0 h-24 bg-linear-to-r ${section.glow}`} aria-hidden="true" />
 
               <div className="relative grid gap-5 xl:grid-cols-[280px_1fr] xl:items-start">
-                <div className="relative overflow-hidden rounded-[24px] bg-slate-100">
+                <div className="relative overflow-hidden rounded-3xl bg-slate-100">
                   <img
                     src={section.image}
                     alt={section.alt}
@@ -345,29 +352,29 @@ function TheoryPage() {
 
                   <div className="mt-5 grid gap-4 md:grid-cols-2">
                     <section className="rounded-2xl bg-slate-50/85 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.06)]">
-                      <h3 className="text-xs font-semibold tracking-[0.1em] text-slate-500 uppercase">{'Quan \u0111i\u1ec3m'}</h3>
+                      <h3 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{'Quan \u0111i\u1ec3m'}</h3>
                       <p className="mt-2 text-base leading-relaxed text-slate-700">{section.perspective}</p>
                     </section>
 
-                    <section className={`rounded-2xl bg-gradient-to-r ${section.quoteTone} px-4 py-3 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.06)]`}>
-                      <h3 className="text-xs font-semibold tracking-[0.1em] text-slate-500 uppercase">{'Tr\u00edch d\u1eabn'}</h3>
+                    <section className={`rounded-2xl bg-linear-to-r ${section.quoteTone} px-4 py-3 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.06)]`}>
+                      <h3 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{'Tr\u00edch d\u1eabn'}</h3>
                       <p className="mt-2 text-base leading-relaxed italic text-slate-800">{`"${section.quote}"`}</p>
                     </section>
 
                     <section className="rounded-2xl bg-slate-50/85 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.06)]">
-                      <h3 className="text-xs font-semibold tracking-[0.1em] text-slate-500 uppercase">{'Gi\u1ea3i th\u00edch d\u1ec5 hi\u1ec3u'}</h3>
+                      <h3 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{'Gi\u1ea3i th\u00edch d\u1ec5 hi\u1ec3u'}</h3>
                       <p className="mt-2 text-base leading-relaxed text-slate-700">{section.explain}</p>
                     </section>
 
                     <section className="rounded-2xl bg-slate-50/85 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.06)]">
-                      <h3 className="text-xs font-semibold tracking-[0.1em] text-slate-500 uppercase">{'V\u00ed d\u1ee5 th\u1ef1c t\u1ebf'}</h3>
+                      <h3 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{'V\u00ed d\u1ee5 th\u1ef1c t\u1ebf'}</h3>
                       <p className="mt-2 text-base leading-relaxed text-slate-700">{section.example}</p>
                     </section>
                   </div>
 
                   {section.mechanisms && (
                     <section className="mt-4 rounded-2xl bg-white/85 px-4 py-4 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.07)]">
-                      <h3 className="text-xs font-semibold tracking-[0.1em] text-slate-500 uppercase">{'Hai c\u01a1 ch\u1ebf ch\u00ednh'}</h3>
+                      <h3 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{'Hai c\u01a1 ch\u1ebf ch\u00ednh'}</h3>
                       <div className="mt-3 grid gap-3 sm:grid-cols-2">
                         {section.mechanisms.map((item) => (
                           <div key={item.name} className="rounded-xl bg-emerald-50/55 px-3 py-2.5">
@@ -380,7 +387,7 @@ function TheoryPage() {
                   )}
 
                   <section className="mt-4 rounded-2xl bg-white/90 px-4 py-3 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.07)]">
-                    <h3 className="text-xs font-semibold tracking-[0.1em] text-slate-500 uppercase">{'K\u1ebft lu\u1eadn'}</h3>
+                    <h3 className="text-xs font-semibold tracking-widest text-slate-500 uppercase">{'K\u1ebft lu\u1eadn'}</h3>
                     <p className="mt-2 text-base font-medium leading-relaxed text-slate-800">{section.conclusion}</p>
                   </section>
 
@@ -413,9 +420,9 @@ function TheoryPage() {
 
         <div className="space-y-3">
           {challengeOrder.map((challenge, index) => {
-            const correct = isCorrectPosition(challenge, index)
-            const isDragging = draggedChallengeId === challenge.id
+            const showCorrectTick = sequentiallyCorrectByIndex[index]
             const isDropTarget = dragOverChallengeId === challenge.id && draggedChallengeId !== challenge.id
+            const displayPosition = index + 1
 
             return (
               <article
@@ -426,20 +433,20 @@ function TheoryPage() {
                 onDrop={(event) => handleChallengeDrop(event, challenge.id)}
                 onDragEnd={handleChallengeDragEnd}
                 className={`cursor-grab rounded-2xl px-4 py-4 active:cursor-grabbing ${
-                  correct
+                  showCorrectTick
                     ? 'bg-emerald-50/90 shadow-[inset_0_0_0_1px_rgba(5,150,105,0.25)]'
                     : 'bg-slate-50/90 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]'
-                } ${isDropTarget ? 'ring-2 ring-indigo-400' : ''} ${isDragging ? 'opacity-70' : ''}`}
+                } ${isDropTarget ? 'ring-2 ring-indigo-400' : ''}`}
               >
                 <div className="mb-2 flex items-start justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="inline-flex h-7 min-w-7 items-center justify-center rounded-full bg-indigo-600 px-2 text-xs font-bold text-white">
-                      {challenge.id}
+                      {displayPosition}
                     </span>
                     <h3 className="text-base font-semibold text-slate-800">{challenge.title}</h3>
                   </div>
                   <div className="flex items-center gap-2">
-                    {correct && (
+                    {showCorrectTick && (
                       <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
                         <CheckCircle2 className="h-4 w-4" />
                       </span>
