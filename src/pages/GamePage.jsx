@@ -418,33 +418,15 @@ const COMPANY_RATE_PERCENT = Math.round(COMPANY_RATE * 100);
 const COMPANY_TAKE_PER_ROUND = ROUND_CREATED_VALUE * COMPANY_RATE;
 const DRIVER_GROSS_PER_ROUND = ROUND_CREATED_VALUE - COMPANY_TAKE_PER_ROUND;
 const ONE_STAR_FINE_FEE = 20;
-const FUEL_BASE_FEE = 3;
-const FUEL_GROWTH_INTERVAL = 3;
-const FUEL_GROWTH_STEP = 1;
-const MOTORBIKE_BASE_FEE = 2;
-const MOTORBIKE_GROWTH_INTERVAL = 4;
-const MOTORBIKE_GROWTH_STEP = 1;
+const FUEL_RATE = 0.25;
+const MOTORBIKE_RATE = 0.1;
+const FUEL_RATE_PERCENT = Math.round(FUEL_RATE * 100);
+const MOTORBIKE_RATE_PERCENT = Math.round(MOTORBIKE_RATE * 100);
 
 const chipBase =
   "rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-[0_10px_24px_rgba(13,55,89,0.1)] backdrop-blur-md";
 
 const formatMoney = (value) => `${value}k`;
-
-const calculateProgressiveFeeTotal = (
-  rideCount,
-  baseFee,
-  growthInterval,
-  growthStep,
-) => {
-  let totalFee = 0;
-
-  for (let ride = 1; ride <= rideCount; ride += 1) {
-    const growthTier = Math.floor((ride - 1) / growthInterval);
-    totalFee += baseFee + growthTier * growthStep;
-  }
-
-  return totalFee;
-};
 
 const shuffleQuestions = (pool) => {
   const shuffled = [...pool];
@@ -501,27 +483,13 @@ function GamePage() {
     ? Math.round((answeredInCurrentCycle / questionSet.length) * 100)
     : 0;
   const answeredRounds = correctCount + wrongCount;
+  const driverBeforeAnyFeeTotal = answeredRounds * ROUND_CREATED_VALUE;
   const driverAfterPlatformFeeTotal = answeredRounds * DRIVER_GROSS_PER_ROUND;
   const driverTakeHomeBase = driverAfterPlatformFeeTotal - oneStarPenaltyTotal;
-  const fuelFeeTotal = useMemo(
-    () =>
-      calculateProgressiveFeeTotal(
-        correctCount,
-        FUEL_BASE_FEE,
-        FUEL_GROWTH_INTERVAL,
-        FUEL_GROWTH_STEP,
-      ),
-    [correctCount],
-  );
-  const motorbikeFeeTotal = useMemo(
-    () =>
-      calculateProgressiveFeeTotal(
-        correctCount,
-        MOTORBIKE_BASE_FEE,
-        MOTORBIKE_GROWTH_INTERVAL,
-        MOTORBIKE_GROWTH_STEP,
-      ),
-    [correctCount],
+  const fuelFeeTotal = Math.max(0, driverTakeHomeBase * FUEL_RATE);
+  const motorbikeFeeTotal = Math.max(
+    0,
+    Math.ceil(driverTakeHomeBase * MOTORBIKE_RATE),
   );
   const totalOperatingFees = fuelFeeTotal + motorbikeFeeTotal;
   const actualDriverEarning = driverTakeHomeBase - totalOperatingFees;
@@ -727,9 +695,7 @@ function GamePage() {
               {`Phí 1 sao đã được trừ trong Thực nhận tài xế: -${formatMoney(oneStarPenaltyTotal)}.`}
             </p>
             <p className="mt-1 text-xs text-slate-600">
-              {
-                "Phí xăng và phí xe máy tăng dần theo số câu đúng để mô phỏng tài xế làm việc nhiều giờ hơn."
-              }
+              {`Phí xăng = ${FUEL_RATE_PERCENT}% và phí xe máy = ${MOTORBIKE_RATE_PERCENT}% của Thực nhận tài xế sau nền tảng.`}
             </p>
           </div>
         )}
@@ -999,6 +965,14 @@ function GamePage() {
               <p className="mt-2 text-sm font-semibold text-slate-600">{`Công ty đang nắm ${companyShare}% tổng dòng tiền.`}</p>
 
               <div className="mx-auto mt-5 grid max-w-3xl gap-4 sm:grid-cols-2">
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)] sm:col-span-2">
+                  <p className="text-sm text-slate-500">
+                    {"Tiền tài xế làm ra trước mọi phí"}
+                  </p>
+                  <p className="text-2xl font-semibold text-sky-700">
+                    {formatMoney(driverBeforeAnyFeeTotal)}
+                  </p>
+                </div>
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
                   <p className="text-sm text-slate-500">
                     {"Thực nhận sau phí nền tảng"}
