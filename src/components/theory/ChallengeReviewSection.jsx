@@ -55,6 +55,16 @@ function ChallengeReviewSection({ motionVariant }) {
 
   const isCorrectPosition = (challenge, index) =>
     challenge.id === expectedChallengeIds[index];
+  const sequentiallyCorrectByIndex = challengeOrder.reduce(
+    (result, challenge, index) => {
+      const currentCorrect = isCorrectPosition(challenge, index);
+      const previousSequentiallyCorrect =
+        index === 0 ? true : result[index - 1];
+      result.push(currentCorrect && previousSequentiallyCorrect);
+      return result;
+    },
+    [],
+  );
   const isChallengeSolved = challengeOrder.every((challenge, index) =>
     isCorrectPosition(challenge, index),
   );
@@ -83,11 +93,12 @@ function ChallengeReviewSection({ motionVariant }) {
 
       <div className="space-y-3">
         {challengeOrder.map((challenge, index) => {
-          const correct = isCorrectPosition(challenge, index);
+          const showCorrectTick = sequentiallyCorrectByIndex[index];
           const isDragging = draggedChallengeId === challenge.id;
           const isDropTarget =
             dragOverChallengeId === challenge.id &&
             draggedChallengeId !== challenge.id;
+          const displayPosition = index + 1;
 
           return (
             <article
@@ -102,7 +113,7 @@ function ChallengeReviewSection({ motionVariant }) {
               onDrop={(event) => handleChallengeDrop(event, challenge.id)}
               onDragEnd={handleChallengeDragEnd}
               className={`cursor-grab rounded-2xl px-4 py-4 active:cursor-grabbing transition-all ${
-                correct
+                showCorrectTick
                   ? "bg-emerald-50/90 shadow-[inset_0_0_0_1px_rgba(5,150,105,0.3)]"
                   : "bg-slate-50/90 shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)] hover:shadow-[inset_0_0_0_1px_rgba(15,42,66,0.15)]"
               } ${isDropTarget ? "ring-2 ring-indigo-400 scale-105" : ""} ${
@@ -112,14 +123,14 @@ function ChallengeReviewSection({ motionVariant }) {
               <div className="mb-2 flex items-start justify-between gap-3">
                 <div className="flex items-center gap-3">
                   <span className="inline-flex h-8 min-w-8 items-center justify-center rounded-full bg-indigo-600 px-2 text-xs font-bold text-white shadow-sm">
-                    {challenge.id}
+                    {displayPosition}
                   </span>
                   <h3 className="text-base font-semibold text-slate-800">
                     {challenge.title}
                   </h3>
                 </div>
                 <div className="flex items-center gap-2">
-                  {correct && (
+                  {showCorrectTick && (
                     <span className="inline-flex h-8 w-8 items-center justify-center rounded-full bg-emerald-100 text-emerald-700">
                       <CheckCircle2 className="h-4 w-4" />
                     </span>
