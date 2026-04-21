@@ -1,5 +1,6 @@
-import { useEffect, useMemo, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import grabDriverImage from "../assets/grab-drvier.png";
 import {
   BriefcaseBusiness,
   Building2,
@@ -8,263 +9,672 @@ import {
   Play,
   RotateCcw,
   TrendingUp,
-} from 'lucide-react'
+} from "lucide-react";
 
 const QUESTION_POOL = [
   {
-    id: 'q01',
-    prompt: 'Bạn tạo ra 500k nhưng chỉ nhận 300k. Phần còn lại gọi là gì?',
-    options: ['Tiền thưởng', 'Giá trị thặng dư', 'Chi phí vận hành'],
+    id: "q01",
+    prompt:
+      "Một tài xế tạo ra 1.000.000đ từ cuốc xe nhưng chỉ nhận 700.000đ. 300.000đ còn lại gọi là gì?",
+    tag: "cơ bản",
+    options: ["Chi phí vận hành", "Giá trị thặng dư", "Tiền thưởng", "Thuế"],
     correctIndex: 1,
+    explanation:
+      "Phần giá trị tài xế tạo ra nhưng không được nhận chính là giá trị thặng dư.",
   },
   {
-    id: 'q02',
-    prompt: 'Theo Marx, nguồn gốc giá trị mới chủ yếu đến từ đâu?',
-    options: ['Lao động sống', 'Máy móc tự động', 'Quảng cáo'],
-    correctIndex: 0,
+    id: "q02",
+    prompt: "Trong mô hình Grab, ai là người giữ phần lớn giá trị thặng dư?",
+    tag: "nền tảng",
+    options: ["Tài xế", "Khách hàng", "Công ty nền tảng", "Nhà nước"],
+    correctIndex: 2,
+    explanation:
+      "Nền tảng thu phí từ mỗi chuyến đi mà không trực tiếp lao động.",
   },
   {
-    id: 'q03',
-    prompt: 'Lợi nhuận trong thị trường là biểu hiện của cái gì?',
-    options: ['Giá trị thặng dư', 'Tiền thưởng cố định', 'Tiền thuê'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q04',
-    prompt: 'Tăng giờ làm để tạo thêm giá trị thặng dư là dạng nào?',
-    options: ['Thặng dư tuyệt đối', 'Thặng dư tương đối', 'Không liên quan'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q05',
-    prompt: 'Tăng năng suất để rút ngắn lao động tất yếu là dạng nào?',
-    options: ['Thặng dư tương đối', 'Thặng dư tuyệt đối', 'Chỉ là marketing'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q06',
-    prompt: 'Trong nền kinh tế số, ai quyết định hiển thị giá và phân bổ đơn?',
-    options: ['Người lao động', 'Nền tảng và thuật toán', 'Người mua'],
+    id: "q03",
+    prompt: "Grab thu tiền từ mỗi cuốc xe là hình thức gì?",
+    tag: "nền tảng",
+    options: ["Lương", "Hoa hồng nền tảng", "Thuế", "Tiền vay"],
     correctIndex: 1,
+    explanation:
+      "Đây là khoản phí nền tảng thu để đổi lấy quyền kết nối tài xế và khách.",
   },
   {
-    id: 'q07',
-    prompt: 'Tài xế Grab tạo doanh thu, nhưng bị trừ chiết khấu. Điều này cho thấy điều gì?',
-    options: ['Phân chia giá trị không đều', 'Tăng thu nhập đồng đều', 'Không có giá trị thặng dư'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q08',
-    prompt: 'Freelancer bị thu phí trung gian trên mỗi hợp đồng. Phần phí đó thường đi về đâu?',
-    options: ['Nền tảng', 'Khách hàng', 'Nhà nước'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q09',
-    prompt: 'Công nghệ có thể làm gì trong quá trình tạo giá trị?',
-    options: ['Tăng tốc độ và năng suất lao động', 'Tự tạo giá trị mới không cần người', 'Xóa bỏ hoàn toàn lao động'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q10',
-    prompt: 'Người lao động nhìn thấy thu nhập tăng nhẹ, công ty tăng nhanh hơn. Ai hưởng lợi nhiều hơn?',
-    options: ['Người lao động', 'Công ty', 'Hai bên bằng nhau'],
+    id: "q04",
+    prompt:
+      "Dữ liệu hành trình của tài xế (giờ cao điểm, khu vực đông khách) giúp Grab làm gì?",
+    tag: "dữ liệu",
+    options: [
+      "Không dùng",
+      "Tối ưu giá và tăng lợi nhuận",
+      "Giảm giá",
+      "Chỉ lưu trữ",
+    ],
     correctIndex: 1,
+    explanation:
+      "Dữ liệu giúp nền tảng điều chỉnh giá để thu được nhiều giá trị hơn.",
   },
   {
-    id: 'q11',
-    prompt: 'Dữ liệu và thuật toán trong nền tảng số đóng vai trò gì?',
-    options: ['Công cụ kiểm soát phân phối giá trị', 'Chỉ để trang trí giao diện', 'Không có tác dụng'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q12',
-    prompt: 'Nếu lương giữ nguyên nhưng năng suất tăng, phần giá trị chênh lệch thường thuộc về ai?',
-    options: ['Chủ nền tảng/doanh nghiệp', 'Người lao động giữ toàn bộ', 'Không thuộc về ai'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q13',
-    prompt: 'Người lao động không làm việc thì giá trị mới có được tạo ra không?',
-    options: ['Không', 'Có vì máy tự tạo', 'Có vì quảng cáo'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q14',
-    prompt: 'Tăng giờ online để nhận thêm đơn liên quan đến cơ chế nào?',
-    options: ['Mở rộng lao động để tạo thặng dư', 'Giảm lao động tất yếu', 'Không liên quan'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q15',
-    prompt: 'Trên sàn thương mại điện tử, người bán mua quảng cáo để được hiển thị tốt hơn. Ai đặt luật cho việc này?',
-    options: ['Nền tảng', 'Người bán', 'Người mua'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q16',
-    prompt: 'Câu nào đúng nhất với chủ đề giá trị thặng dư trong kinh tế số?',
-    options: ['Người tạo giá trị luôn giữ hết giá trị', 'Người tạo giá trị không chắc giữ phần lớn', 'Giá trị không cần lao động'],
+    id: "q05",
+    prompt: "Vì sao Grab có thể mở rộng nhanh mà không tăng chi phí tương ứng?",
+    tag: "lý thuyết",
+    options: [
+      "Có nhiều tiền",
+      "Chi phí biên gần bằng 0",
+      "Ít khách",
+      "Không cần tài xế",
+    ],
     correctIndex: 1,
+    explanation: "Thêm tài xế không làm tăng nhiều chi phí hệ thống.",
   },
   {
-    id: 'q17',
-    prompt: 'Nếu công ty thu phí trên từng giao dịch, dòng tiền đó được ghi nhận thành gì?',
-    options: ['Doanh thu của công ty', 'Lương của tài xế', 'Hỗ trợ của khách'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q18',
-    prompt: 'Khi người lao động không nắm quyền đặt giá, họ thiếu điều gì?',
-    options: ['Quyền lực thương lượng', 'Thời gian online', 'Số lượng đơn'],
-    correctIndex: 0,
-  },
-  {
-    id: 'q19',
-    prompt: 'Mục tiêu của game Dòng tiền là gì?',
-    options: ['Chỉ để giải trí', 'Làm rõ dòng tiền và ai giữ tiền', 'Đo tốc độ bấm nút'],
+    id: "q06",
+    prompt: "Tài xế tự mua xe, tự trả xăng thể hiện điều gì?",
+    tag: "lao động",
+    options: [
+      "Tăng quyền lợi",
+      "Chuyển chi phí sang tài xế",
+      "Không ảnh hưởng",
+      "Giảm giá",
+    ],
     correctIndex: 1,
+    explanation: "Nền tảng giảm chi phí, từ đó giữ lại nhiều thặng dư hơn.",
   },
   {
-    id: 'q20',
-    prompt: 'Sau cùng, thông điệp cốt lõi của chủ đề này là gì?',
-    options: ['Tiền luôn chia đều', 'Giá trị có thể được tạo ra bởi người lao động nhưng bị giữ lại bởi hệ thống', 'Công nghệ xóa bỏ mọi bất bình đẳng'],
+    id: "q07",
+    prompt: "Thuật toán định giá (giờ cao điểm giá tăng) nhằm mục tiêu gì?",
+    tag: "ví dụ",
+    options: [
+      "Giảm thu nhập tài xế",
+      "Tối đa hóa doanh thu",
+      "Giảm khách",
+      "Không liên quan",
+    ],
     correctIndex: 1,
+    explanation: "Giá cao giúp nền tảng thu nhiều tiền hơn từ mỗi chuyến.",
   },
-]
+  {
+    id: "q08",
+    prompt: "Hành vi nhận/huỷ cuốc của tài xế tạo ra gì cho Grab?",
+    tag: "dữ liệu",
+    options: [
+      "Không có giá trị",
+      "Dữ liệu huấn luyện thuật toán",
+      "Chi phí",
+      "Thuế",
+    ],
+    correctIndex: 1,
+    explanation: "Dữ liệu này giúp cải thiện hệ thống và tăng lợi nhuận.",
+  },
+  {
+    id: "q09",
+    prompt: "Khách dùng app miễn phí nhưng vẫn tạo giá trị bằng cách nào?",
+    tag: "nền tảng",
+    options: [
+      "Không tạo giá trị",
+      "Tạo dữ liệu và nhu cầu",
+      "Chỉ tiêu tiền",
+      "Không liên quan",
+    ],
+    correctIndex: 1,
+    explanation: "Hành vi của khách giúp nền tảng kiếm tiền từ dữ liệu.",
+  },
+  {
+    id: "q10",
+    prompt: "So với taxi truyền thống, Grab khác ở điểm nào về thặng dư?",
+    tag: "so sánh",
+    options: [
+      "Không khác",
+      "Khai thác thêm dữ liệu",
+      "Ít lợi nhuận hơn",
+      "Không có thặng dư",
+    ],
+    correctIndex: 1,
+    explanation: "Ngoài lao động, nền tảng còn kiếm từ dữ liệu và thuật toán.",
+  },
 
-const QUESTIONS_PER_GAME = 10
-const INITIAL_PLAYER_MONEY = 500
-const INITIAL_COMPANY_MONEY = 300
-const PLAYER_CORRECT_BONUS = 100
-const PLAYER_WRONG_PENALTY = 50
-const ROUND_CREATED_VALUE = 430
-const COMPANY_RATE = 0.3
-const COMPANY_TAKE_PER_ROUND = Math.round(ROUND_CREATED_VALUE * COMPANY_RATE)
+  // ===== 11–50 =====
+
+  {
+    id: "q11",
+    prompt: "Nếu nhiều tài xế tham gia, Grab có lợi gì?",
+    tag: "network",
+    options: [
+      "Chi phí tăng mạnh",
+      "Tăng hiệu ứng mạng",
+      "Giảm lợi nhuận",
+      "Không ảnh hưởng",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Càng nhiều tài xế, nền tảng càng mạnh và thu được nhiều thặng dư hơn.",
+  },
+  {
+    id: "q12",
+    prompt: "Tài xế bị khóa tài khoản thể hiện điều gì?",
+    tag: "lao động",
+    options: [
+      "Bình thường",
+      "Nền tảng có quyền lực cao",
+      "Có bảo vệ",
+      "Không ảnh hưởng",
+    ],
+    correctIndex: 1,
+    explanation: "Thu nhập của tài xế phụ thuộc hoàn toàn vào nền tảng.",
+  },
+  {
+    id: "q13",
+    prompt: "Grab giữ dữ liệu khách hàng có lợi gì?",
+    tag: "dữ liệu",
+    options: [
+      "Không có",
+      "Tăng khả năng kiếm tiền",
+      "Giảm chi phí",
+      "Không liên quan",
+    ],
+    correctIndex: 1,
+    explanation: "Dữ liệu giúp bán quảng cáo và tối ưu dịch vụ.",
+  },
+  {
+    id: "q14",
+    prompt: "Việc gọi tài xế là 'đối tác' có ý nghĩa gì?",
+    tag: "lao động",
+    options: [
+      "Tăng quyền lợi",
+      "Giảm trách nhiệm của công ty",
+      "Không khác",
+      "Tăng lương",
+    ],
+    correctIndex: 1,
+    explanation: "Công ty không phải trả bảo hiểm hay phúc lợi.",
+  },
+  {
+    id: "q15",
+    prompt: "Nếu Grab tăng phí hoa hồng, điều gì xảy ra?",
+    tag: "nền tảng",
+    options: [
+      "Tài xế hưởng lợi",
+      "Nền tảng giữ nhiều thặng dư hơn",
+      "Khách hưởng lợi",
+      "Không ảnh hưởng",
+    ],
+    correctIndex: 1,
+    explanation: "Phần thu nhập của tài xế giảm, nền tảng giữ nhiều hơn.",
+  },
+  {
+    id: "q16",
+    prompt: "Khi Grab thu 25% hoa hồng mỗi cuốc xe, phần này thuộc loại gì?",
+    tag: "nền tảng",
+    options: [
+      "Chi phí vận hành",
+      "Giá trị thặng dư nền tảng",
+      "Tiền thưởng tài xế",
+      "Thuế nhà nước",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Đây là phần giá trị nền tảng giữ lại từ lao động của tài xế mà không trực tiếp tham gia chạy xe.",
+  },
+  {
+    id: "q17",
+    prompt:
+      "Việc tài xế phải tự trả chi phí xăng xe ảnh hưởng gì đến thặng dư?",
+    tag: "lao động",
+    options: [
+      "Giảm thặng dư của nền tảng",
+      "Tăng thặng dư nền tảng",
+      "Không ảnh hưởng",
+      "Tăng lương tài xế",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Chi phí bị chuyển sang tài xế, giúp nền tảng giữ lại nhiều giá trị hơn.",
+  },
+  {
+    id: "q18",
+    prompt:
+      "Nếu tài xế chạy nhiều giờ hơn nhưng thu nhập không tăng tương ứng, điều đó cho thấy gì?",
+    tag: "cơ bản",
+    options: [
+      "Hiệu suất tăng",
+      "Tỷ lệ thặng dư tăng",
+      "Không liên quan",
+      "Chi phí giảm",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Tài xế tạo ra nhiều giá trị hơn nhưng không được trả tương xứng, phần chênh lệch tăng lên.",
+  },
+  {
+    id: "q19",
+    prompt: "Tại sao Grab khuyến khích tài xế chạy vào giờ cao điểm?",
+    tag: "ví dụ",
+    options: [
+      "Để tài xế nghỉ ngơi",
+      "Tăng doanh thu từ giá cao",
+      "Giảm nhu cầu",
+      "Không liên quan",
+    ],
+    correctIndex: 1,
+    explanation: "Giá cao điểm giúp nền tảng thu nhiều tiền hơn từ mỗi chuyến.",
+  },
+  {
+    id: "q20",
+    prompt: "Nếu nhiều tài xế cạnh tranh cùng lúc, điều gì xảy ra?",
+    tag: "lao động",
+    options: [
+      "Thu nhập tăng",
+      "Thu nhập trung bình giảm",
+      "Không thay đổi",
+      "Giá tăng",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Cạnh tranh cao làm giảm khả năng nhận cuốc, từ đó giảm thu nhập mỗi người.",
+  },
+  {
+    id: "q21",
+    prompt: "Thuật toán phân cuốc xe của Grab giúp gì cho nền tảng?",
+    tag: "dữ liệu",
+    options: [
+      "Giảm lợi nhuận",
+      "Tối ưu hóa phân phối và tăng hiệu quả",
+      "Không ảnh hưởng",
+      "Chỉ hỗ trợ tài xế",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Thuật toán giúp tối đa hóa số chuyến và doanh thu toàn hệ thống.",
+  },
+  {
+    id: "q22",
+    prompt: "Việc tài xế phải duy trì rating cao (điểm sao) có ý nghĩa gì?",
+    tag: "lao động",
+    options: [
+      "Không liên quan",
+      "Tăng chất lượng dịch vụ mà không tăng chi phí cho nền tảng",
+      "Giảm thặng dư",
+      "Tăng lương",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Tài xế phải nỗ lực phục vụ tốt hơn nhưng không được trả thêm tương ứng.",
+  },
+  {
+    id: "q23",
+    prompt: "Dữ liệu hành vi khách hàng giúp Grab làm gì?",
+    tag: "dữ liệu",
+    options: [
+      "Không dùng",
+      "Dự đoán nhu cầu và điều chỉnh giá",
+      "Giảm lợi nhuận",
+      "Chỉ lưu trữ",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Dữ liệu giúp nền tảng định giá tốt hơn để tối đa hóa doanh thu.",
+  },
+  {
+    id: "q24",
+    prompt:
+      "Nếu Grab tăng giá với khách nhưng giữ nguyên phần chia cho tài xế, điều gì xảy ra?",
+    tag: "nền tảng",
+    options: [
+      "Tài xế hưởng lợi",
+      "Nền tảng giữ thêm thặng dư",
+      "Khách hưởng lợi",
+      "Không thay đổi",
+    ],
+    correctIndex: 1,
+    explanation: "Phần chênh lệch tăng thêm sẽ thuộc về nền tảng.",
+  },
+  {
+    id: "q25",
+    prompt: "Tại sao tài xế khó rời bỏ nền tảng như Grab?",
+    tag: "network",
+    options: [
+      "Không có lý do",
+      "Hiệu ứng mạng và phụ thuộc khách hàng",
+      "Thu nhập cao",
+      "Không có cạnh tranh",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Nền tảng có nhiều khách nên tài xế phụ thuộc vào đó để kiếm sống.",
+  },
+  {
+    id: "q26",
+    prompt: "Nếu Grab cung cấp thưởng (bonus) theo số cuốc, mục tiêu là gì?",
+    tag: "ví dụ",
+    options: [
+      "Giảm thu nhập tài xế",
+      "Khuyến khích làm việc nhiều hơn",
+      "Giảm số chuyến",
+      "Không liên quan",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Thưởng giúp tăng số chuyến, từ đó tăng tổng doanh thu nền tảng.",
+  },
+  {
+    id: "q27",
+    prompt: "Việc tài xế chờ cuốc (thời gian rảnh) có được trả tiền không?",
+    tag: "lao động",
+    options: ["Có", "Không", "Tùy ngày", "Tùy khách"],
+    correctIndex: 1,
+    explanation:
+      "Thời gian chờ không được trả lương nhưng vẫn là thời gian lao động thực tế.",
+  },
+  {
+    id: "q28",
+    prompt: "Điều gì xảy ra khi nền tảng đạt vị thế gần như độc quyền?",
+    tag: "độc quyền",
+    options: [
+      "Giảm lợi nhuận",
+      "Tăng khả năng thu phí và thặng dư",
+      "Tăng cạnh tranh",
+      "Không ảnh hưởng",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Ít đối thủ giúp nền tảng dễ tăng phí mà người dùng khó rời bỏ.",
+  },
+  {
+    id: "q29",
+    prompt: "Nếu Grab sử dụng dữ liệu để bán quảng cáo, điều đó có nghĩa gì?",
+    tag: "dữ liệu",
+    options: [
+      "Không liên quan tài xế",
+      "Tạo thêm nguồn thặng dư từ dữ liệu",
+      "Giảm lợi nhuận",
+      "Chỉ hỗ trợ khách",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Dữ liệu không chỉ phục vụ vận hành mà còn tạo thêm nguồn thu mới.",
+  },
+  {
+    id: "q30",
+    prompt:
+      "Tổng thể, mô hình Grab cho thấy điều gì về giá trị thặng dư trong kinh tế số?",
+    tag: "tổng kết",
+    options: [
+      "Thặng dư biến mất",
+      "Thặng dư tăng và đa dạng (lao động + dữ liệu)",
+      "Không thay đổi",
+      "Chỉ từ khách hàng",
+    ],
+    correctIndex: 1,
+    explanation:
+      "Không chỉ từ lao động tài xế, nền tảng còn tạo thặng dư từ dữ liệu và quy mô hệ thống.",
+  },
+];
+
+const INITIAL_COMPANY_MONEY = 0;
+const ROUND_CREATED_VALUE = 30;
+const COMPANY_RATE = 0.3;
+const COMPANY_RATE_PERCENT = Math.round(COMPANY_RATE * 100);
+const COMPANY_TAKE_PER_ROUND = ROUND_CREATED_VALUE * COMPANY_RATE;
+const DRIVER_GROSS_PER_ROUND = ROUND_CREATED_VALUE - COMPANY_TAKE_PER_ROUND;
+const ONE_STAR_FINE_FEE = 20;
+const FUEL_BASE_FEE = 3;
+const FUEL_GROWTH_INTERVAL = 3;
+const FUEL_GROWTH_STEP = 1;
+const MOTORBIKE_BASE_FEE = 2;
+const MOTORBIKE_GROWTH_INTERVAL = 4;
+const MOTORBIKE_GROWTH_STEP = 1;
 
 const chipBase =
-  'rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-[0_10px_24px_rgba(13,55,89,0.1)] backdrop-blur-md'
+  "rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-[0_10px_24px_rgba(13,55,89,0.1)] backdrop-blur-md";
 
-const formatMoney = (value) => `${value}k`
+const formatMoney = (value) => `${value}k`;
 
-const pickRandomQuestions = (pool, count) => {
-  const shuffled = [...pool]
+const calculateProgressiveFeeTotal = (
+  rideCount,
+  baseFee,
+  growthInterval,
+  growthStep,
+) => {
+  let totalFee = 0;
+
+  for (let ride = 1; ride <= rideCount; ride += 1) {
+    const growthTier = Math.floor((ride - 1) / growthInterval);
+    totalFee += baseFee + growthTier * growthStep;
+  }
+
+  return totalFee;
+};
+
+const shuffleQuestions = (pool) => {
+  const shuffled = [...pool];
 
   for (let index = shuffled.length - 1; index > 0; index -= 1) {
-    const randomIndex = Math.floor(Math.random() * (index + 1))
-    ;[shuffled[index], shuffled[randomIndex]] = [shuffled[randomIndex], shuffled[index]]
+    const randomIndex = Math.floor(Math.random() * (index + 1));
+    [shuffled[index], shuffled[randomIndex]] = [
+      shuffled[randomIndex],
+      shuffled[index],
+    ];
   }
 
-  return shuffled.slice(0, count)
-}
+  return shuffled;
+};
 
 function GamePage() {
-  const MotionDiv = motion.div
-  const MotionSection = motion.section
+  const MotionDiv = motion.div;
+  const MotionSection = motion.section;
 
-  const [gameStarted, setGameStarted] = useState(false)
-  const [questionSet, setQuestionSet] = useState([])
-  const [currentIndex, setCurrentIndex] = useState(0)
-  const [money, setMoney] = useState(INITIAL_PLAYER_MONEY)
-  const [companyMoney, setCompanyMoney] = useState(INITIAL_COMPANY_MONEY)
-  const [correctCount, setCorrectCount] = useState(0)
-  const [wrongCount, setWrongCount] = useState(0)
-  const [feedback, setFeedback] = useState(null)
-  const [locked, setLocked] = useState(false)
-  const [flash, setFlash] = useState(null)
-  const [flashKey, setFlashKey] = useState(0)
+  const [gameStarted, setGameStarted] = useState(false);
+  const [shiftEnded, setShiftEnded] = useState(false);
+  const [questionSet, setQuestionSet] = useState([]);
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [totalAnswered, setTotalAnswered] = useState(0);
+  const [companyMoney, setCompanyMoney] = useState(INITIAL_COMPANY_MONEY);
+  const [correctCount, setCorrectCount] = useState(0);
+  const [wrongCount, setWrongCount] = useState(0);
+  const [feedback, setFeedback] = useState(null);
+  const [locked, setLocked] = useState(false);
+  const [selectedOptionIndex, setSelectedOptionIndex] = useState(null);
+  const [flash, setFlash] = useState(null);
+  const [flashKey, setFlashKey] = useState(0);
+  const [pendingOneStarPenaltyRides, setPendingOneStarPenaltyRides] =
+    useState(0);
+  const [oneStarPenaltyTotal, setOneStarPenaltyTotal] = useState(0);
 
-  const currentQuestion = gameStarted && currentIndex < QUESTIONS_PER_GAME ? questionSet[currentIndex] : null
-  const isFinished = gameStarted && currentIndex >= QUESTIONS_PER_GAME
-  const answeredCount = Math.min(currentIndex, QUESTIONS_PER_GAME)
-  const progressValue = Math.round((answeredCount / QUESTIONS_PER_GAME) * 100)
+  const currentQuestion =
+    gameStarted && !shiftEnded && questionSet.length > 0
+      ? (questionSet[currentIndex] ?? null)
+      : null;
+  const isFinished = gameStarted && shiftEnded;
+  const isShiftRunning = gameStarted && !shiftEnded;
+  const isDriverExiting = gameStarted && shiftEnded;
+  const shouldAnimateDriverScene = isShiftRunning || isDriverExiting;
+  const driverMotionClass = isShiftRunning
+    ? "animate-driver-arrive"
+    : isDriverExiting
+      ? "animate-driver-exit"
+      : "left-[calc(50%-8rem)]";
+  const answeredInCurrentCycle = questionSet.length
+    ? Math.min(currentIndex, questionSet.length)
+    : 0;
+  const progressValue = questionSet.length
+    ? Math.round((answeredInCurrentCycle / questionSet.length) * 100)
+    : 0;
+  const answeredRounds = correctCount + wrongCount;
+  const driverAfterPlatformFeeTotal = answeredRounds * DRIVER_GROSS_PER_ROUND;
+  const driverTakeHomeBase = driverAfterPlatformFeeTotal - oneStarPenaltyTotal;
+  const fuelFeeTotal = useMemo(
+    () =>
+      calculateProgressiveFeeTotal(
+        correctCount,
+        FUEL_BASE_FEE,
+        FUEL_GROWTH_INTERVAL,
+        FUEL_GROWTH_STEP,
+      ),
+    [correctCount],
+  );
+  const motorbikeFeeTotal = useMemo(
+    () =>
+      calculateProgressiveFeeTotal(
+        correctCount,
+        MOTORBIKE_BASE_FEE,
+        MOTORBIKE_GROWTH_INTERVAL,
+        MOTORBIKE_GROWTH_STEP,
+      ),
+    [correctCount],
+  );
+  const totalOperatingFees = fuelFeeTotal + motorbikeFeeTotal;
+  const actualDriverEarning = driverTakeHomeBase - totalOperatingFees;
 
   const companyShare = useMemo(() => {
-    const total = money + companyMoney
-    if (total <= 0) return 0
-    return Math.round((companyMoney / total) * 100)
-  }, [money, companyMoney])
+    const driverTakeHome = Math.max(actualDriverEarning, 0);
+    const total = driverTakeHome + companyMoney;
+    if (total <= 0) return 0;
+    return Math.round((companyMoney / total) * 100);
+  }, [actualDriverEarning, companyMoney]);
 
   useEffect(() => {
-    if (!flash) return undefined
+    if (!flash) return undefined;
 
-    const timer = setTimeout(() => setFlash(null), 1000)
-    return () => clearTimeout(timer)
-  }, [flashKey, flash])
+    const timer = setTimeout(() => setFlash(null), 1000);
+    return () => clearTimeout(timer);
+  }, [flashKey, flash]);
 
   const startGame = () => {
-    setGameStarted(true)
-    setQuestionSet(pickRandomQuestions(QUESTION_POOL, QUESTIONS_PER_GAME))
-    setCurrentIndex(0)
-    setMoney(INITIAL_PLAYER_MONEY)
-    setCompanyMoney(INITIAL_COMPANY_MONEY)
-    setCorrectCount(0)
-    setWrongCount(0)
-    setFeedback(null)
-    setLocked(false)
-    setFlash(null)
-  }
+    setGameStarted(true);
+    setShiftEnded(false);
+    setQuestionSet(shuffleQuestions(QUESTION_POOL));
+    setCurrentIndex(0);
+    setTotalAnswered(0);
+    setCompanyMoney(INITIAL_COMPANY_MONEY);
+    setCorrectCount(0);
+    setWrongCount(0);
+    setFeedback(null);
+    setLocked(false);
+    setSelectedOptionIndex(null);
+    setFlash(null);
+    setPendingOneStarPenaltyRides(0);
+    setOneStarPenaltyTotal(0);
+  };
+
+  const endShift = () => {
+    if (!gameStarted || shiftEnded) return;
+    setShiftEnded(true);
+    setLocked(false);
+    setSelectedOptionIndex(null);
+    setFeedback(null);
+  };
 
   const handleAnswer = (selectedIndex) => {
-    if (locked || !currentQuestion) return
+    if (locked || !currentQuestion) return;
 
-    const isCorrect = selectedIndex === currentQuestion.correctIndex
-    const playerDelta = isCorrect ? PLAYER_CORRECT_BONUS : -PLAYER_WRONG_PENALTY
+    setSelectedOptionIndex(selectedIndex);
 
-    setMoney((prev) => prev + playerDelta)
-    setCompanyMoney((prev) => prev + COMPANY_TAKE_PER_ROUND)
+    const isCorrect = selectedIndex === currentQuestion.correctIndex;
+    const hasPendingOneStarFine = pendingOneStarPenaltyRides > 0;
+    const oneStarFineAppliedThisRide = hasPendingOneStarFine
+      ? ONE_STAR_FINE_FEE
+      : 0;
+    const companyDeltaThisRide =
+      COMPANY_TAKE_PER_ROUND + oneStarFineAppliedThisRide;
+    const rideActualEarning = Math.max(
+      0,
+      DRIVER_GROSS_PER_ROUND - oneStarFineAppliedThisRide,
+    );
+
+    setCompanyMoney((prev) => prev + companyDeltaThisRide);
+
+    if (oneStarFineAppliedThisRide > 0) {
+      setOneStarPenaltyTotal((prev) => prev + oneStarFineAppliedThisRide);
+    }
+
+    setPendingOneStarPenaltyRides(
+      (prev) => Math.max(prev - 1, 0) + (isCorrect ? 0 : 1),
+    );
 
     if (isCorrect) {
-      setCorrectCount((prev) => prev + 1)
+      setCorrectCount((prev) => prev + 1);
     } else {
-      setWrongCount((prev) => prev + 1)
+      setWrongCount((prev) => prev + 1);
     }
 
     setFeedback({
-      type: isCorrect ? 'success' : 'error',
-      text: isCorrect ? 'Chính xác!' : 'Sai rồi!',
-      playerDelta,
-      companyDelta: COMPANY_TAKE_PER_ROUND,
-    })
+      type: isCorrect ? "success" : "error",
+      text: isCorrect ? "Chính xác!" : "Sai rồi!",
+      explanation: currentQuestion.explanation,
+      ridePrice: ROUND_CREATED_VALUE,
+      rideDriverEarning: DRIVER_GROSS_PER_ROUND,
+      rideActualEarning,
+      oneStarFineAppliedThisRide,
+      oneStarFineNextRide: isCorrect ? 0 : ONE_STAR_FINE_FEE,
+      companyDelta: companyDeltaThisRide,
+      companyRatePercent: COMPANY_RATE_PERCENT,
+    });
 
-    setLocked(true)
-    setFlash({
-      playerDelta,
-      companyDelta: COMPANY_TAKE_PER_ROUND,
-    })
-    setFlashKey((prev) => prev + 1)
-  }
+    setLocked(true);
+    if (isCorrect) {
+      setFlash({
+        driverDelta: rideActualEarning,
+        companyDelta: companyDeltaThisRide,
+        oneStarFineAppliedThisRide,
+      });
+      setFlashKey((prev) => prev + 1);
+    } else {
+      setFlash(null);
+    }
+  };
 
   const handleNext = () => {
-    if (!locked) return
+    if (!locked) return;
 
-    setFeedback(null)
-    setLocked(false)
-    setCurrentIndex((prev) => prev + 1)
-  }
+    setFeedback(null);
+    setLocked(false);
+    setSelectedOptionIndex(null);
+    setTotalAnswered((prev) => prev + 1);
+    setCurrentIndex((prev) => {
+      const nextIndex = prev + 1;
+
+      if (nextIndex >= questionSet.length) {
+        setQuestionSet(shuffleQuestions(QUESTION_POOL));
+        return 0;
+      }
+
+      return nextIndex;
+    });
+  };
 
   return (
     <section className="animate-fade-up animate-fade-up-delay-1 w-full px-1 sm:px-2">
       <header className="mb-8 text-center">
-        <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-rose-700 uppercase">{'Dòng tiền'}</p>
-        <h1 className="text-4xl font-semibold text-slate-800 sm:text-5xl">{'Ai giữ tiền?'}</h1>
+        <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-rose-700 uppercase">
+          {"Dòng tiền"}
+        </p>
+        <h1 className="text-4xl font-semibold text-slate-800 sm:text-5xl">
+          {"Ai giữ tiền?"}
+        </h1>
         <p className="mx-auto mt-2 max-w-3xl text-lg text-slate-600 sm:text-xl">
-          {'Trả lời 10 câu hỏi ngẫu nhiên để xem dòng tiền của bạn và công ty chạy như thế nào.'}
+          {
+            "Bắt đầu ca làm để trả lời câu hỏi liên tục. Khi kết thúc ca, game sẽ dừng và tổng kết dòng tiền."
+          }
         </p>
       </header>
 
       <article className="rounded-[30px] border border-white/70 bg-white/70 p-5 shadow-[0_18px_40px_rgba(13,55,89,0.12)] backdrop-blur-md sm:p-7">
         <div className="mb-6 grid gap-3 md:grid-cols-3">
           <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Tiền của bạn'}</p>
-            <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-emerald-700">
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+              {"Thực nhận tài xế"}
+            </p>
+            <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-teal-700">
               <BriefcaseBusiness className="h-5 w-5" />
-              {formatMoney(money)}
+              {formatMoney(driverTakeHomeBase)}
             </p>
           </div>
 
           <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Công ty'}</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+              {"Công ty"}
+            </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-rose-700">
               <Building2 className="h-5 w-5" />
               {formatMoney(companyMoney)}
@@ -272,17 +682,132 @@ function GamePage() {
           </div>
 
           <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">{'Câu hỏi'}</p>
+            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+              {"Câu hỏi"}
+            </p>
             <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-indigo-700">
               <TrendingUp className="h-5 w-5" />
-              {gameStarted ? `${isFinished ? QUESTIONS_PER_GAME : currentIndex + 1}/${QUESTIONS_PER_GAME}` : `0/${QUESTIONS_PER_GAME}`}
+              {gameStarted
+                ? `${isFinished ? answeredInCurrentCycle : currentIndex + 1}/${questionSet.length || QUESTION_POOL.length}`
+                : `0/${QUESTION_POOL.length}`}
             </p>
           </div>
         </div>
 
+        {gameStarted && !shiftEnded && (
+          <div className="mb-4 flex justify-end">
+            <button
+              type="button"
+              onClick={endShift}
+              className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
+            >
+              {"Kết thúc ca"}
+            </button>
+          </div>
+        )}
+
         <div className="mb-5 h-3 w-full overflow-hidden rounded-full bg-slate-200">
-          <div className="h-full bg-indigo-500 transition-all duration-300" style={{ width: `${progressValue}%` }} />
+          <div
+            className="h-full bg-indigo-500 transition-all duration-300"
+            style={{ width: `${progressValue}%` }}
+          />
         </div>
+
+        {isFinished && (
+          <div className="mb-5 rounded-xl border border-teal-100 bg-teal-50/70 px-4 py-3 text-sm text-slate-700">
+            <p className="font-semibold text-teal-800">
+              {
+                "Thực nhận sau tất cả phí = Thực nhận tài xế - phí xăng - phí xe máy"
+              }
+            </p>
+            <p className="mt-1">
+              {`Thực nhận tài xế ${formatMoney(driverTakeHomeBase)} | xăng -${formatMoney(fuelFeeTotal)} | xe máy -${formatMoney(motorbikeFeeTotal)}`}
+            </p>
+            <p className="mt-1 text-xs text-slate-600">
+              {`Phí 1 sao đã được trừ trong Thực nhận tài xế: -${formatMoney(oneStarPenaltyTotal)}.`}
+            </p>
+            <p className="mt-1 text-xs text-slate-600">
+              {
+                "Phí xăng và phí xe máy tăng dần theo số câu đúng để mô phỏng tài xế làm việc nhiều giờ hơn."
+              }
+            </p>
+          </div>
+        )}
+
+        {gameStarted && (
+          <section className="mb-5 overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-r from-cyan-50 via-teal-50 to-emerald-50 p-4">
+            <div className="relative h-40 overflow-hidden rounded-xl border border-white/80 bg-gradient-to-b from-sky-100 via-sky-50 to-white">
+              <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-sky-200/60 via-sky-100/45 to-transparent" />
+              <div className="absolute top-4 right-8 h-8 w-8 rounded-full bg-amber-200/90 shadow-[0_0_24px_rgba(251,191,36,0.45)]" />
+
+              <div className="absolute top-6 left-8 h-3 w-14 rounded-full bg-white/80" />
+              <div className="absolute top-5 left-13 h-4 w-18 rounded-full bg-white/85" />
+              <div className="absolute top-7 left-28 h-3 w-12 rounded-full bg-white/80" />
+
+              <div className="absolute inset-x-0 bottom-12 h-20">
+                <div className="absolute bottom-0 left-3 flex items-end gap-2">
+                  <div className="h-10 w-5 rounded-t-md bg-slate-400/85" />
+                  <div className="h-15 w-6 rounded-t-md bg-slate-500/85" />
+                  <div className="h-12 w-5 rounded-t-md bg-slate-400/85" />
+                  <div className="h-18 w-7 rounded-t-md bg-slate-500/85" />
+                  <div className="h-13 w-5 rounded-t-md bg-slate-400/85" />
+                </div>
+
+                <div className="absolute bottom-0 right-4 flex items-end gap-2">
+                  <div className="h-12 w-5 rounded-t-md bg-slate-400/85" />
+                  <div className="h-17 w-7 rounded-t-md bg-slate-500/85" />
+                  <div className="h-11 w-5 rounded-t-md bg-slate-400/85" />
+                  <div className="h-14 w-6 rounded-t-md bg-slate-500/85" />
+                </div>
+              </div>
+
+              <div className="absolute inset-x-0 bottom-12 h-7 bg-gradient-to-t from-emerald-200/70 to-transparent" />
+
+              <div className="absolute bottom-12 left-12 h-8 w-8 rounded-full bg-emerald-500/90" />
+              <div className="absolute bottom-[3.05rem] left-[3.95rem] h-4 w-1 rounded bg-amber-900/70" />
+
+              <div className="absolute bottom-12 left-29 h-7 w-7 rounded-full bg-emerald-500/90" />
+              <div className="absolute bottom-[3.05rem] left-[7.45rem] h-4 w-1 rounded bg-amber-900/70" />
+
+              <div className="absolute bottom-12 right-20 h-9 w-9 rounded-full bg-emerald-500/90" />
+              <div className="absolute bottom-[3.05rem] right-[5.55rem] h-4 w-1 rounded bg-amber-900/70" />
+
+              <div className="absolute bottom-12 right-9 h-7 w-7 rounded-full bg-emerald-500/90" />
+              <div className="absolute bottom-[3.05rem] right-[2.95rem] h-4 w-1 rounded bg-amber-900/70" />
+
+              <div className="absolute bottom-0 left-0 h-12 w-full bg-black">
+                <div
+                  className={`absolute top-1/2 left-0 h-1 w-full -translate-y-1/2 bg-[repeating-linear-gradient(to_right,#ffffff_0_24px,transparent_24px_44px)] ${shouldAnimateDriverScene ? "animate-lane-flow" : ""}`}
+                />
+              </div>
+
+              <div className={`absolute bottom-4 w-64 ${driverMotionClass}`}>
+                <div className="relative h-32 w-64">
+                  <AnimatePresence>
+                    {flash && isShiftRunning && (
+                      <MotionDiv
+                        key={`driver-delta-${flashKey}`}
+                        initial={{ opacity: 0, y: 6, scale: 0.9 }}
+                        animate={{ opacity: 1, y: -16, scale: 1 }}
+                        exit={{ opacity: 0, y: -30, scale: 0.92 }}
+                        transition={{ duration: 0.85, ease: "easeOut" }}
+                        className={`absolute -top-1 left-1/2 -translate-x-1/2 rounded-full px-3 py-1 text-sm font-bold shadow ${flash.driverDelta >= 0 ? "bg-emerald-100 text-emerald-700" : "bg-rose-100 text-rose-700"}`}
+                      >
+                        {`${flash.driverDelta >= 0 ? "+" : ""}${flash.driverDelta}k`}
+                      </MotionDiv>
+                    )}
+                  </AnimatePresence>
+                  <img
+                    src={grabDriverImage}
+                    alt="Grab rider driving with passenger"
+                    className={`absolute bottom-0 left-1/2 h-32 w-auto max-w-none -translate-x-1/2 object-contain select-none ${shouldAnimateDriverScene ? "animate-bike-bob" : ""}`}
+                    draggable={false}
+                  />
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
 
         <AnimatePresence>
           {flash && (
@@ -295,13 +820,17 @@ function GamePage() {
             >
               <span
                 className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                  flash.playerDelta >= 0 ? 'bg-emerald-100 text-emerald-700' : 'bg-rose-100 text-rose-700'
+                  flash.driverDelta >= 0
+                    ? "bg-emerald-100 text-emerald-700"
+                    : "bg-rose-100 text-rose-700"
                 }`}
               >
-                {`${flash.playerDelta >= 0 ? '+' : ''}${flash.playerDelta}k`}
+                {`${flash.driverDelta >= 0 ? "+" : ""}${flash.driverDelta}k`}
               </span>
               <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">
-                {`Công ty +${flash.companyDelta}k`}
+                {flash.oneStarFineAppliedThisRide > 0
+                  ? `Công ty +${flash.companyDelta}k (${COMPANY_RATE_PERCENT}% + phí 1 sao)`
+                  : `Công ty +${flash.companyDelta}k (${COMPANY_RATE_PERCENT}%)`}
               </span>
             </MotionDiv>
           )}
@@ -310,9 +839,13 @@ function GamePage() {
         <main className="rounded-2xl bg-slate-50/80 p-5 sm:p-6">
           {!gameStarted && (
             <section className="text-center">
-              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{'Bạn là người lao động trong nền kinh tế số'}</h2>
+              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">
+                {"Bạn là người lao động trong nền kinh tế số"}
+              </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
-                {'Game có 20 câu hỏi trong kho. Mỗi lần chơi sẽ rút ngẫu nhiên 10 câu. Mục tiêu là kiếm tiền, nhưng công ty luôn lấy phần trăm mỗi vòng.'}
+                {
+                  "Game sẽ chạy theo ca làm: bắt đầu ca thì câu hỏi xuất hiện liên tục. Hệ thống sẽ chạy hết toàn bộ ngân hàng câu hỏi, sau đó tự xáo lại và tiếp tục."
+                }
               </p>
               <button
                 type="button"
@@ -320,7 +853,7 @@ function GamePage() {
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
               >
                 <Play className="h-4 w-4" />
-                {'Bắt đầu làm việc'}
+                {"Bắt đầu ca làm"}
               </button>
             </section>
           )}
@@ -328,20 +861,41 @@ function GamePage() {
           {gameStarted && !isFinished && currentQuestion && (
             <section>
               <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{`Câu ${currentIndex + 1}`}</h2>
-              <p className="mt-2 text-lg leading-relaxed text-slate-700">{currentQuestion.prompt}</p>
+              <p className="mt-2 text-lg leading-relaxed text-slate-700">
+                {currentQuestion.prompt}
+              </p>
 
               <div className="mt-4 grid gap-3">
-                {currentQuestion.options.map((option, optionIndex) => (
-                  <button
-                    key={`${currentQuestion.id}-${option}`}
-                    type="button"
-                    onClick={() => handleAnswer(optionIndex)}
-                    disabled={locked}
-                    className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-left text-base font-medium text-slate-700 transition hover:border-indigo-300 hover:bg-indigo-50 disabled:cursor-not-allowed disabled:opacity-70"
-                  >
-                    {option}
-                  </button>
-                ))}
+                {currentQuestion.options.map((option, optionIndex) => {
+                  const isCorrectOption =
+                    optionIndex === currentQuestion.correctIndex;
+                  const isSelectedOption = optionIndex === selectedOptionIndex;
+                  const shouldHighlightCorrect =
+                    locked && feedback?.type === "error" && isCorrectOption;
+                  const shouldHighlightWrongSelection =
+                    locked &&
+                    feedback?.type === "error" &&
+                    isSelectedOption &&
+                    !isCorrectOption;
+
+                  return (
+                    <button
+                      key={`${currentQuestion.id}-${option}`}
+                      type="button"
+                      onClick={() => handleAnswer(optionIndex)}
+                      disabled={locked}
+                      className={`rounded-xl border bg-white px-4 py-3 text-left text-base font-medium transition disabled:cursor-not-allowed disabled:opacity-80 ${
+                        shouldHighlightCorrect
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-800"
+                          : shouldHighlightWrongSelection
+                            ? "border-rose-400 bg-rose-50 text-rose-800"
+                            : "border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50"
+                      }`}
+                    >
+                      {option}
+                    </button>
+                  );
+                })}
               </div>
 
               <AnimatePresence>
@@ -350,14 +904,41 @@ function GamePage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className={`mt-5 rounded-xl px-4 py-3 ${feedback.type === 'success' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`}
+                    className={`mt-5 rounded-xl px-4 py-3 ${feedback.type === "success" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}
                   >
                     <p className="flex items-center gap-2 font-semibold">
-                      {feedback.type === 'success' ? <CircleCheckBig className="h-4 w-4" /> : <CircleX className="h-4 w-4" />}
+                      {feedback.type === "success" ? (
+                        <CircleCheckBig className="h-4 w-4" />
+                      ) : (
+                        <CircleX className="h-4 w-4" />
+                      )}
                       {feedback.text}
                     </p>
-                    <p className="mt-1 text-sm">
-                      {`Bạn ${feedback.playerDelta >= 0 ? '+' : ''}${feedback.playerDelta}k | Công ty +${feedback.companyDelta}k`}
+                    {feedback.type === "success" ? (
+                      <>
+                        <p className="mt-1 text-sm">
+                          {`Giá cuốc: ${formatMoney(feedback.ridePrice)} | Công ty +${feedback.companyDelta}k`}
+                        </p>
+                        <p className="mt-1 text-sm">
+                          {`Tài xế thực nhận sau nền tảng lấy phí: +${feedback.rideActualEarning}k`}
+                        </p>
+                        {feedback.oneStarFineAppliedThisRide > 0 && (
+                          <p className="mt-1 text-sm text-amber-700">
+                            {`Cuốc này bị trừ ${feedback.oneStarFineAppliedThisRide}k do 1 sao từ cuốc trước.`}
+                          </p>
+                        )}
+                      </>
+                    ) : (
+                      <>
+                        <p className="mt-1 text-sm text-amber-700">
+                          {feedback.oneStarFineAppliedThisRide > 0
+                            ? `Cuốc này bị trừ ${feedback.oneStarFineAppliedThisRide}k do lỗi trước đó. Lỗi hiện tại sẽ tiếp tục trừ ${feedback.oneStarFineNextRide}k ở cuốc kế tiếp.`
+                            : `Tài xế bị đánh giá 1 sao. Phí ${feedback.oneStarFineNextRide}k sẽ trừ ở cuốc kế tiếp.`}
+                        </p>
+                      </>
+                    )}
+                    <p className="mt-2 text-sm text-slate-700">
+                      {`Giải thích: ${feedback.explanation}`}
                     </p>
                   </MotionSection>
                 )}
@@ -369,48 +950,115 @@ function GamePage() {
                   onClick={handleNext}
                   className="mt-5 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
                 >
-                  {'Câu tiếp theo'}
+                  {"Câu tiếp theo"}
                 </button>
               )}
+
+              <p className="mt-4 text-sm font-medium text-slate-500">
+                {`Đã trả lời ${totalAnswered + (locked ? 1 : 0)} câu trong ca hiện tại.`}
+              </p>
             </section>
           )}
 
           {isFinished && (
             <section className="text-center">
-              <h2 className="text-3xl font-semibold text-slate-800">{'Hoàn thành 10 câu hỏi'}</h2>
+              <h2 className="text-3xl font-semibold text-slate-800">
+                {"Kết thúc ca làm"}
+              </h2>
               <p className="mt-3 text-base text-slate-600 sm:text-lg">
-                {'Bạn đã trả lời xong 10 câu ngẫu nhiên từ ngân hàng 20 câu hỏi.'}
+                {
+                  "Game đã dừng theo thao tác kết thúc ca. Bạn có thể bắt đầu ca mới bất kỳ lúc nào."
+                }
               </p>
 
               <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
                 <div className="rounded-xl bg-emerald-100/90 px-4 py-4 text-left">
-                  <p className="text-sm font-semibold uppercase text-emerald-700">{'Bạn giữ'}</p>
-                  <p className="mt-1 text-3xl font-semibold text-emerald-800">{formatMoney(money)}</p>
+                  <p className="text-sm font-semibold uppercase text-emerald-700">
+                    {"Doanh thu "}
+                  </p>
+                  <p className="mt-1 text-3xl font-semibold text-emerald-800">
+                    {formatMoney(actualDriverEarning)}
+                  </p>
                 </div>
                 <div className="rounded-xl bg-rose-100/90 px-4 py-4 text-left">
-                  <p className="text-sm font-semibold uppercase text-rose-700">{'Công ty giữ'}</p>
-                  <p className="mt-1 text-3xl font-semibold text-rose-800">{formatMoney(companyMoney)}</p>
+                  <p className="text-sm font-semibold uppercase text-rose-700">
+                    {"Công ty giữ"}
+                  </p>
+                  <p className="mt-1 text-3xl font-semibold text-rose-800">
+                    {formatMoney(companyMoney)}
+                  </p>
                 </div>
               </div>
 
               <div className="mx-auto mt-5 h-3 w-full max-w-3xl overflow-hidden rounded-full bg-slate-200">
-                <div className="h-full bg-rose-500" style={{ width: `${companyShare}%` }} />
+                <div
+                  className="h-full bg-rose-500"
+                  style={{ width: `${companyShare}%` }}
+                />
               </div>
               <p className="mt-2 text-sm font-semibold text-slate-600">{`Công ty đang nắm ${companyShare}% tổng dòng tiền.`}</p>
 
               <div className="mx-auto mt-5 grid max-w-3xl gap-4 sm:grid-cols-2">
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
-                  <p className="text-sm text-slate-500">{'Đúng'}</p>
-                  <p className="text-2xl font-semibold text-emerald-700">{correctCount}</p>
+                  <p className="text-sm text-slate-500">
+                    {"Thực nhận sau phí nền tảng"}
+                  </p>
+                  <p className="text-2xl font-semibold text-slate-700">
+                    {formatMoney(driverTakeHomeBase)}
+                  </p>
                 </div>
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
-                  <p className="text-sm text-slate-500">{'Sai'}</p>
-                  <p className="text-2xl font-semibold text-rose-700">{wrongCount}</p>
+                  <p className="text-sm text-slate-500">
+                    {"Phí phạt rating 1 sao (đã trừ)"}
+                  </p>
+                  <p className="text-2xl font-semibold text-rose-700">
+                    {`-${formatMoney(oneStarPenaltyTotal)}`}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
+                  <p className="text-sm text-slate-500">{"Phí xăng"}</p>
+                  <p className="text-2xl font-semibold text-amber-700">
+                    {`-${formatMoney(fuelFeeTotal)}`}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
+                  <p className="text-sm text-slate-500">{"Phí xe máy"}</p>
+                  <p className="text-2xl font-semibold text-amber-700">
+                    {`-${formatMoney(motorbikeFeeTotal)}`}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-emerald-50 px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(16,185,129,0.2)] sm:col-span-2">
+                  <p className="text-sm text-emerald-700">
+                    {"Thực nhận sau tất cả phí"}
+                  </p>
+                  <p className="text-2xl font-semibold text-emerald-800">
+                    {formatMoney(actualDriverEarning)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
+                  <p className="text-sm text-slate-500">{"Đã trả lời"}</p>
+                  <p className="text-2xl font-semibold text-indigo-700">
+                    {totalAnswered + (locked ? 1 : 0)}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
+                  <p className="text-sm text-slate-500">{"Đúng"}</p>
+                  <p className="text-2xl font-semibold text-emerald-700">
+                    {correctCount}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)] sm:col-span-2">
+                  <p className="text-sm text-slate-500">{"Sai"}</p>
+                  <p className="text-2xl font-semibold text-rose-700">
+                    {wrongCount}
+                  </p>
                 </div>
               </div>
 
               <p className="mx-auto mt-6 max-w-2xl text-lg font-medium text-slate-800">
-                {'Bạn tạo ra giá trị... nhưng bạn không giữ phần lớn giá trị đó.'}
+                {
+                  "Bạn tạo ra giá trị... nhưng bạn không giữ phần lớn giá trị đó."
+                }
               </p>
 
               <button
@@ -419,14 +1067,14 @@ function GamePage() {
                 className="mt-6 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
               >
                 <RotateCcw className="h-4 w-4" />
-                {'Chơi lại'}
+                {"Bắt đầu ca mới"}
               </button>
             </section>
           )}
         </main>
       </article>
     </section>
-  )
+  );
 }
 
-export default GamePage
+export default GamePage;
