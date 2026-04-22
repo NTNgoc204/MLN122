@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import grabDriverImage from "../assets/grab-drvier.png";
 import {
@@ -418,10 +418,13 @@ const COMPANY_RATE_PERCENT = Math.round(COMPANY_RATE * 100);
 const COMPANY_TAKE_PER_ROUND = ROUND_CREATED_VALUE * COMPANY_RATE;
 const DRIVER_GROSS_PER_ROUND = ROUND_CREATED_VALUE - COMPANY_TAKE_PER_ROUND;
 const ONE_STAR_FINE_FEE = 20;
-const FUEL_RATE = 0.25;
+const FUEL_RATE = 0.15;
 const MOTORBIKE_RATE = 0.1;
+const IDLE_RATE = 0.15;
 const FUEL_RATE_PERCENT = Math.round(FUEL_RATE * 100);
 const MOTORBIKE_RATE_PERCENT = Math.round(MOTORBIKE_RATE * 100);
+const IDLE_RATE_PERCENT = Math.round(IDLE_RATE * 100);
+const SHIFT_QUESTION_LIMIT = 8;
 
 const chipBase =
   "rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-[0_10px_24px_rgba(13,55,89,0.1)] backdrop-blur-md";
@@ -476,30 +479,34 @@ function GamePage() {
     : isDriverExiting
       ? "animate-driver-exit"
       : "left-[calc(50%-8rem)]";
-  const answeredInCurrentCycle = questionSet.length
-    ? Math.min(currentIndex, questionSet.length)
-    : 0;
-  const progressValue = questionSet.length
-    ? Math.round((answeredInCurrentCycle / questionSet.length) * 100)
-    : 0;
+  const answeredInCurrentShift = Math.min(
+    totalAnswered + (locked ? 1 : 0),
+    SHIFT_QUESTION_LIMIT,
+  );
+  const currentQuestionNumber = Math.min(
+    totalAnswered + 1,
+    SHIFT_QUESTION_LIMIT,
+  );
+  const progressValue = Math.round(
+    (answeredInCurrentShift / SHIFT_QUESTION_LIMIT) * 100,
+  );
+  const questionProgressLabel = gameStarted
+    ? `${isFinished ? SHIFT_QUESTION_LIMIT : currentQuestionNumber}/${SHIFT_QUESTION_LIMIT}`
+    : `0/${SHIFT_QUESTION_LIMIT}`;
   const answeredRounds = correctCount + wrongCount;
   const driverBeforeAnyFeeTotal = answeredRounds * ROUND_CREATED_VALUE;
   const driverAfterPlatformFeeTotal = answeredRounds * DRIVER_GROSS_PER_ROUND;
+  const platformFeeTotal =
+    driverBeforeAnyFeeTotal - driverAfterPlatformFeeTotal;
   const driverTakeHomeBase = driverAfterPlatformFeeTotal - oneStarPenaltyTotal;
-  const fuelFeeTotal = Math.max(0, driverTakeHomeBase * FUEL_RATE);
+  const fuelFeeTotal = Math.max(0, Math.ceil(driverTakeHomeBase * FUEL_RATE));
   const motorbikeFeeTotal = Math.max(
     0,
     Math.ceil(driverTakeHomeBase * MOTORBIKE_RATE),
   );
-  const totalOperatingFees = fuelFeeTotal + motorbikeFeeTotal;
+  const idleFeeTotal = Math.max(0, Math.ceil(driverTakeHomeBase * IDLE_RATE));
+  const totalOperatingFees = fuelFeeTotal + motorbikeFeeTotal + idleFeeTotal;
   const actualDriverEarning = driverTakeHomeBase - totalOperatingFees;
-
-  const companyShare = useMemo(() => {
-    const driverTakeHome = Math.max(actualDriverEarning, 0);
-    const total = driverTakeHome + companyMoney;
-    if (total <= 0) return 0;
-    return Math.round((companyMoney / total) * 100);
-  }, [actualDriverEarning, companyMoney]);
 
   useEffect(() => {
     if (!flash) return undefined;
@@ -595,10 +602,18 @@ function GamePage() {
   const handleNext = () => {
     if (!locked) return;
 
+    const answeredAfterNext = totalAnswered + 1;
+
     setFeedback(null);
     setLocked(false);
     setSelectedOptionIndex(null);
-    setTotalAnswered((prev) => prev + 1);
+    setTotalAnswered(answeredAfterNext);
+
+    if (answeredAfterNext >= SHIFT_QUESTION_LIMIT) {
+      endShift();
+      return;
+    }
+
     setCurrentIndex((prev) => {
       const nextIndex = prev + 1;
 
@@ -613,95 +628,125 @@ function GamePage() {
 
   return (
     <section className="animate-fade-up animate-fade-up-delay-1 w-full px-1 sm:px-2">
-      <header className="mb-8 text-center">
-        <p className="mb-2 text-xs font-semibold tracking-[0.2em] text-rose-700 uppercase">
+      <header
+        className={isShiftRunning ? "mb-3 text-center" : "mb-8 text-center"}
+      >
+        <p
+          className={`${
+            isShiftRunning ? "mb-1 text-[10px]" : "mb-2 text-xs"
+          } font-semibold tracking-[0.2em] text-rose-700 uppercase`}
+        >
           {"Dòng tiền"}
         </p>
-        <h1 className="text-4xl font-semibold text-slate-800 sm:text-5xl">
+        <h1
+          className={
+            isShiftRunning
+              ? "text-2xl font-semibold text-slate-800 sm:text-3xl"
+              : "text-4xl font-semibold text-slate-800 sm:text-5xl"
+          }
+        >
           {"Ai giữ tiền?"}
         </h1>
-        <p className="mx-auto mt-2 max-w-3xl text-lg text-slate-600 sm:text-xl">
-          {
-            "Bắt đầu ca làm để trả lời câu hỏi liên tục. Khi kết thúc ca, game sẽ dừng và tổng kết dòng tiền."
-          }
-        </p>
+        {!isShiftRunning && (
+          <p className="mx-auto mt-2 max-w-3xl text-lg text-slate-600 sm:text-xl">
+            {
+              "Bắt đầu ca làm để trả lời câu hỏi liên tục. Khi kết thúc ca, game sẽ dừng và tổng kết dòng tiền."
+            }
+          </p>
+        )}
       </header>
 
-      <article className="rounded-[30px] border border-white/70 bg-white/70 p-5 shadow-[0_18px_40px_rgba(13,55,89,0.12)] backdrop-blur-md sm:p-7">
-        <div className="mb-6 grid gap-3 md:grid-cols-3">
-          <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
-              {"Thực nhận tài xế"}
-            </p>
-            <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-teal-700">
-              <BriefcaseBusiness className="h-5 w-5" />
-              {formatMoney(driverTakeHomeBase)}
-            </p>
-          </div>
+      <article
+        className={`rounded-[30px] border border-white/70 bg-white/70 shadow-[0_18px_40px_rgba(13,55,89,0.12)] backdrop-blur-md ${
+          isShiftRunning ? "p-3 sm:p-4" : "p-5 sm:p-7"
+        }`}
+      >
+        {isShiftRunning ? (
+          <>
+            <div className="mb-3 flex flex-wrap items-center justify-between gap-2 rounded-xl border border-white/80 bg-white/85 px-3 py-2 text-xs sm:text-sm">
+              <p className="font-semibold text-indigo-700">
+                {`Câu ${questionProgressLabel}`}
+              </p>
+              <p className="font-medium text-teal-700">
+                {`Tài xế ${formatMoney(driverTakeHomeBase)}`}
+              </p>
+            </div>
 
-          <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
-              {"Công ty"}
-            </p>
-            <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-rose-700">
-              <Building2 className="h-5 w-5" />
-              {formatMoney(companyMoney)}
-            </p>
-          </div>
+            <div className="mb-3 h-2 w-full overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full bg-indigo-500 transition-all duration-300"
+                style={{ width: `${progressValue}%` }}
+              />
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="mb-6 grid gap-3 md:grid-cols-3">
+              <div className={chipBase}>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                  {"Thực nhận tài xế"}
+                </p>
+                <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-teal-700">
+                  <BriefcaseBusiness className="h-5 w-5" />
+                  {formatMoney(driverTakeHomeBase)}
+                </p>
+              </div>
 
-          <div className={chipBase}>
-            <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
-              {"Câu hỏi"}
-            </p>
-            <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-indigo-700">
-              <TrendingUp className="h-5 w-5" />
-              {gameStarted
-                ? `${isFinished ? answeredInCurrentCycle : currentIndex + 1}/${questionSet.length || QUESTION_POOL.length}`
-                : `0/${QUESTION_POOL.length}`}
-            </p>
-          </div>
-        </div>
+              <div className={chipBase}>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                  {"Công ty"}
+                </p>
+                <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-rose-700">
+                  <Building2 className="h-5 w-5" />
+                  {formatMoney(companyMoney)}
+                </p>
+              </div>
 
-        {gameStarted && !shiftEnded && (
-          <div className="mb-4 flex justify-end">
-            <button
-              type="button"
-              onClick={endShift}
-              className="inline-flex items-center gap-2 rounded-full border border-rose-200 bg-rose-50 px-4 py-2 text-sm font-semibold text-rose-700 transition hover:bg-rose-100"
-            >
-              {"Kết thúc ca"}
-            </button>
-          </div>
+              <div className={chipBase}>
+                <p className="text-xs font-semibold tracking-[0.12em] text-slate-500 uppercase">
+                  {"Câu hỏi"}
+                </p>
+                <p className="mt-1 flex items-center gap-2 text-2xl font-semibold text-indigo-700">
+                  <TrendingUp className="h-5 w-5" />
+                  {questionProgressLabel}
+                </p>
+              </div>
+            </div>
+
+            <div className="mb-5 h-3 w-full overflow-hidden rounded-full bg-slate-200">
+              <div
+                className="h-full bg-indigo-500 transition-all duration-300"
+                style={{ width: `${progressValue}%` }}
+              />
+            </div>
+          </>
         )}
-
-        <div className="mb-5 h-3 w-full overflow-hidden rounded-full bg-slate-200">
-          <div
-            className="h-full bg-indigo-500 transition-all duration-300"
-            style={{ width: `${progressValue}%` }}
-          />
-        </div>
 
         {isFinished && (
           <div className="mb-5 rounded-xl border border-teal-100 bg-teal-50/70 px-4 py-3 text-sm text-slate-700">
             <p className="font-semibold text-teal-800">
               {
-                "Thực nhận sau tất cả phí = Thực nhận tài xế - phí xăng - phí xe máy"
+                "Thực nhận sau tất cả phí = Thực nhận tài xế - phí xăng - phí xe máy - phí chờ cuốc"
               }
             </p>
             <p className="mt-1">
-              {`Thực nhận tài xế ${formatMoney(driverTakeHomeBase)} | xăng -${formatMoney(fuelFeeTotal)} | xe máy -${formatMoney(motorbikeFeeTotal)}`}
+              {`Thực nhận tài xế ${formatMoney(driverTakeHomeBase)} | xăng -${formatMoney(fuelFeeTotal)} | xe máy -${formatMoney(motorbikeFeeTotal)} | idle -${formatMoney(idleFeeTotal)}`}
             </p>
             <p className="mt-1 text-xs text-slate-600">
               {`Phí 1 sao đã được trừ trong Thực nhận tài xế: -${formatMoney(oneStarPenaltyTotal)}.`}
             </p>
             <p className="mt-1 text-xs text-slate-600">
-              {`Phí xăng = ${FUEL_RATE_PERCENT}% và phí xe máy = ${MOTORBIKE_RATE_PERCENT}% của Thực nhận tài xế sau nền tảng.`}
+              {`Phí xăng = ${FUEL_RATE_PERCENT}%, phí xe máy = ${MOTORBIKE_RATE_PERCENT}% và phí idle = ${IDLE_RATE_PERCENT}% của Thực nhận tài xế sau nền tảng.`}
             </p>
           </div>
         )}
 
         {gameStarted && (
-          <section className="mb-5 overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-r from-cyan-50 via-teal-50 to-emerald-50 p-4">
+          <section
+            className={`overflow-hidden rounded-2xl border border-emerald-100 bg-gradient-to-r from-cyan-50 via-teal-50 to-emerald-50 ${
+              isShiftRunning ? "mb-3 p-3" : "mb-5 p-4"
+            }`}
+          >
             <div className="relative h-40 overflow-hidden rounded-xl border border-white/80 bg-gradient-to-b from-sky-100 via-sky-50 to-white">
               <div className="absolute inset-x-0 top-0 h-24 bg-gradient-to-b from-sky-200/60 via-sky-100/45 to-transparent" />
               <div className="absolute top-4 right-8 h-8 w-8 rounded-full bg-amber-200/90 shadow-[0_0_24px_rgba(251,191,36,0.45)]" />
@@ -775,34 +820,11 @@ function GamePage() {
           </section>
         )}
 
-        <AnimatePresence>
-          {flash && (
-            <MotionDiv
-              key={`${flashKey}-${currentIndex}`}
-              initial={{ opacity: 0, y: -10, scale: 0.98 }}
-              animate={{ opacity: 1, y: 0, scale: 1 }}
-              exit={{ opacity: 0, y: -10 }}
-              className="mb-5 flex flex-wrap items-center gap-2"
-            >
-              <span
-                className={`rounded-full px-3 py-1 text-sm font-semibold ${
-                  flash.driverDelta >= 0
-                    ? "bg-emerald-100 text-emerald-700"
-                    : "bg-rose-100 text-rose-700"
-                }`}
-              >
-                {`${flash.driverDelta >= 0 ? "+" : ""}${flash.driverDelta}k`}
-              </span>
-              <span className="rounded-full bg-amber-100 px-3 py-1 text-sm font-semibold text-amber-800">
-                {flash.oneStarFineAppliedThisRide > 0
-                  ? `Công ty +${flash.companyDelta}k (${COMPANY_RATE_PERCENT}% + phí 1 sao)`
-                  : `Công ty +${flash.companyDelta}k (${COMPANY_RATE_PERCENT}%)`}
-              </span>
-            </MotionDiv>
-          )}
-        </AnimatePresence>
-
-        <main className="rounded-2xl bg-slate-50/80 p-5 sm:p-6">
+        <main
+          className={`rounded-2xl bg-slate-50/80 ${
+            isShiftRunning ? "p-3 sm:p-4" : "p-5 sm:p-6"
+          }`}
+        >
           {!gameStarted && (
             <section className="text-center">
               <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">
@@ -810,7 +832,7 @@ function GamePage() {
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
                 {
-                  "Game sẽ chạy theo ca làm: bắt đầu ca thì câu hỏi xuất hiện liên tục. Hệ thống sẽ chạy hết toàn bộ ngân hàng câu hỏi, sau đó tự xáo lại và tiếp tục."
+                  "Mỗi ca gồm 8 câu hỏi. Bạn cần hoàn thành đủ 8 câu thì ca mới kết thúc và tổng kết dòng tiền."
                 }
               </p>
               <button
@@ -826,12 +848,26 @@ function GamePage() {
 
           {gameStarted && !isFinished && currentQuestion && (
             <section>
-              <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">{`Câu ${currentIndex + 1}`}</h2>
-              <p className="mt-2 text-lg leading-relaxed text-slate-700">
+              <h2
+                className={`${
+                  isShiftRunning
+                    ? "text-xl sm:text-2xl"
+                    : "text-2xl sm:text-3xl"
+                } font-semibold text-slate-800`}
+              >{`Câu ${currentQuestionNumber}`}</h2>
+              <p
+                className={`${
+                  isShiftRunning ? "mt-1 text-base" : "mt-2 text-lg"
+                } leading-relaxed text-slate-700`}
+              >
                 {currentQuestion.prompt}
               </p>
 
-              <div className="mt-4 grid gap-3">
+              <div
+                className={`${
+                  isShiftRunning ? "mt-3 gap-2" : "mt-4 gap-3"
+                } grid`}
+              >
                 {currentQuestion.options.map((option, optionIndex) => {
                   const isCorrectOption =
                     optionIndex === currentQuestion.correctIndex;
@@ -850,7 +886,11 @@ function GamePage() {
                       type="button"
                       onClick={() => handleAnswer(optionIndex)}
                       disabled={locked}
-                      className={`rounded-xl border bg-white px-4 py-3 text-left text-base font-medium transition disabled:cursor-not-allowed disabled:opacity-80 ${
+                      className={`rounded-xl border bg-white text-left font-medium transition disabled:cursor-not-allowed disabled:opacity-80 ${
+                        isShiftRunning
+                          ? "px-3 py-2 text-sm"
+                          : "px-4 py-3 text-base"
+                      } ${
                         shouldHighlightCorrect
                           ? "border-emerald-500 bg-emerald-50 text-emerald-800"
                           : shouldHighlightWrongSelection
@@ -870,7 +910,13 @@ function GamePage() {
                     initial={{ opacity: 0, y: 8 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, y: 8 }}
-                    className={`mt-5 rounded-xl px-4 py-3 ${feedback.type === "success" ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}`}
+                    className={`${
+                      isShiftRunning ? "mt-3" : "mt-5"
+                    } rounded-xl px-4 py-3 ${
+                      feedback.type === "success"
+                        ? "bg-emerald-100 text-emerald-800"
+                        : "bg-rose-100 text-rose-800"
+                    }`}
                   >
                     <p className="flex items-center gap-2 font-semibold">
                       {feedback.type === "success" ? (
@@ -914,15 +960,19 @@ function GamePage() {
                 <button
                   type="button"
                   onClick={handleNext}
-                  className="mt-5 inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900"
+                  className={`${
+                    isShiftRunning ? "mt-3" : "mt-5"
+                  } inline-flex items-center gap-2 rounded-full bg-slate-800 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-slate-900`}
                 >
                   {"Câu tiếp theo"}
                 </button>
               )}
 
-              <p className="mt-4 text-sm font-medium text-slate-500">
-                {`Đã trả lời ${totalAnswered + (locked ? 1 : 0)} câu trong ca hiện tại.`}
-              </p>
+              {!isShiftRunning && (
+                <p className="mt-4 text-sm font-medium text-slate-500">
+                  {`Đã trả lời ${answeredInCurrentShift}/${SHIFT_QUESTION_LIMIT} câu trong ca hiện tại.`}
+                </p>
+              )}
             </section>
           )}
 
@@ -933,17 +983,17 @@ function GamePage() {
               </h2>
               <p className="mt-3 text-base text-slate-600 sm:text-lg">
                 {
-                  "Game đã dừng theo thao tác kết thúc ca. Bạn có thể bắt đầu ca mới bất kỳ lúc nào."
+                  "Ca làm đã kết thúc sau khi hoàn thành đủ 8 câu hỏi. Bạn có thể bắt đầu ca mới bất kỳ lúc nào."
                 }
               </p>
 
               <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
                 <div className="rounded-xl bg-emerald-100/90 px-4 py-4 text-left">
                   <p className="text-sm font-semibold uppercase text-emerald-700">
-                    {"Doanh thu "}
+                    {"Tiền kiếm được trước mọi phí"}
                   </p>
                   <p className="mt-1 text-3xl font-semibold text-emerald-800">
-                    {formatMoney(actualDriverEarning)}
+                    {formatMoney(driverBeforeAnyFeeTotal)}
                   </p>
                 </div>
                 <div className="rounded-xl bg-rose-100/90 px-4 py-4 text-left">
@@ -956,29 +1006,11 @@ function GamePage() {
                 </div>
               </div>
 
-              <div className="mx-auto mt-5 h-3 w-full max-w-3xl overflow-hidden rounded-full bg-slate-200">
-                <div
-                  className="h-full bg-rose-500"
-                  style={{ width: `${companyShare}%` }}
-                />
-              </div>
-              <p className="mt-2 text-sm font-semibold text-slate-600">{`Công ty đang nắm ${companyShare}% tổng dòng tiền.`}</p>
-
               <div className="mx-auto mt-5 grid max-w-3xl gap-4 sm:grid-cols-2">
-                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)] sm:col-span-2">
-                  <p className="text-sm text-slate-500">
-                    {"Tiền tài xế làm ra trước mọi phí"}
-                  </p>
-                  <p className="text-2xl font-semibold text-sky-700">
-                    {formatMoney(driverBeforeAnyFeeTotal)}
-                  </p>
-                </div>
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
-                  <p className="text-sm text-slate-500">
-                    {"Thực nhận sau phí nền tảng"}
-                  </p>
-                  <p className="text-2xl font-semibold text-slate-700">
-                    {formatMoney(driverTakeHomeBase)}
+                  <p className="text-sm text-slate-500">{"Phí nền tảng"}</p>
+                  <p className="text-2xl font-semibold text-rose-700">
+                    {`-${formatMoney(platformFeeTotal)}`}
                   </p>
                 </div>
                 <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
@@ -1001,30 +1033,20 @@ function GamePage() {
                     {`-${formatMoney(motorbikeFeeTotal)}`}
                   </p>
                 </div>
+                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
+                  <p className="text-sm text-slate-500">
+                    {"Phí chờ cuốc (idle)"}
+                  </p>
+                  <p className="text-2xl font-semibold text-amber-700">
+                    {`-${formatMoney(idleFeeTotal)}`}
+                  </p>
+                </div>
                 <div className="rounded-xl bg-emerald-50 px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(16,185,129,0.2)] sm:col-span-2">
                   <p className="text-sm text-emerald-700">
                     {"Thực nhận sau tất cả phí"}
                   </p>
                   <p className="text-2xl font-semibold text-emerald-800">
                     {formatMoney(actualDriverEarning)}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
-                  <p className="text-sm text-slate-500">{"Đã trả lời"}</p>
-                  <p className="text-2xl font-semibold text-indigo-700">
-                    {totalAnswered + (locked ? 1 : 0)}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)]">
-                  <p className="text-sm text-slate-500">{"Đúng"}</p>
-                  <p className="text-2xl font-semibold text-emerald-700">
-                    {correctCount}
-                  </p>
-                </div>
-                <div className="rounded-xl bg-white px-4 py-3 text-left shadow-[inset_0_0_0_1px_rgba(15,42,66,0.08)] sm:col-span-2">
-                  <p className="text-sm text-slate-500">{"Sai"}</p>
-                  <p className="text-2xl font-semibold text-rose-700">
-                    {wrongCount}
                   </p>
                 </div>
               </div>
