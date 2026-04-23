@@ -1,7 +1,7 @@
-import { SiDeepmind, SiGooglegemini, SiNotebooklm, SiOpenai } from 'react-icons/si'
+import { SiDeepmind, SiNotebooklm, SiOpenai } from 'react-icons/si'
 
 const overviewData = {
-  title: 'Gi\u00e1 tr\u1ecb th\u1eb7ng d\u01b0 & Kinh t\u1ebf s\u1ed1',
+  title: 'Gi\u00e1 tr\u1ecb th\u1eb7ng d\u01b0 trong kinh t\u1ebf s\u1ed1',
   subtitle: 'Ai th\u1ef1c s\u1ef1 h\u01b0\u1edfng l\u1ee3i trong n\u1ec1n kinh t\u1ebf s\u1ed1?',
   lecturer: 'Gi\u1ea3ng vi\u00ean h\u01b0\u1edbng d\u1eabn: Ho\u00e0ng Th\u1eafng',
   members: [
@@ -27,12 +27,6 @@ const overviewData = {
       subtitle: 'D\u00f9ng \u0111\u1ec3 t\u1ea1o video.',
       icon: SiNotebooklm,
       iconClass: 'from-sky-500 to-cyan-500',
-    },
-    {
-      name: 'Gemini',
-      subtitle: 'D\u00f9ng \u0111\u1ec3 t\u1ea1o \u1ea3nh.',
-      icon: SiGooglegemini,
-      iconClass: 'from-violet-500 to-indigo-500',
     },
     {
       name: 'DeepSeek',
