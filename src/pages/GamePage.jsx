@@ -424,7 +424,7 @@ const IDLE_RATE = 0.15;
 const FUEL_RATE_PERCENT = Math.round(FUEL_RATE * 100);
 const MOTORBIKE_RATE_PERCENT = Math.round(MOTORBIKE_RATE * 100);
 const IDLE_RATE_PERCENT = Math.round(IDLE_RATE * 100);
-const SHIFT_QUESTION_LIMIT = 8;
+const SHIFT_QUESTION_LIMIT = 10;
 
 const chipBase =
   "rounded-2xl border border-white/70 bg-white/80 px-4 py-3 shadow-[0_10px_24px_rgba(13,55,89,0.1)] backdrop-blur-md";
@@ -872,6 +872,11 @@ function GamePage() {
                   const isCorrectOption =
                     optionIndex === currentQuestion.correctIndex;
                   const isSelectedOption = optionIndex === selectedOptionIndex;
+                  const shouldHighlightSelectedCorrect =
+                    locked &&
+                    feedback?.type === "success" &&
+                    isSelectedOption &&
+                    isCorrectOption;
                   const shouldHighlightCorrect =
                     locked && feedback?.type === "error" && isCorrectOption;
                   const shouldHighlightWrongSelection =
@@ -891,11 +896,13 @@ function GamePage() {
                           ? "px-3 py-2 text-sm"
                           : "px-4 py-3 text-base"
                       } ${
-                        shouldHighlightCorrect
-                          ? "border-emerald-500 bg-emerald-50 text-emerald-800"
-                          : shouldHighlightWrongSelection
-                            ? "border-rose-400 bg-rose-50 text-rose-800"
-                            : "border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50"
+                        shouldHighlightSelectedCorrect
+                          ? "border-emerald-500 bg-emerald-50 text-emerald-800 ring-2 ring-emerald-200"
+                          : shouldHighlightCorrect
+                            ? "border-emerald-500 bg-emerald-50 text-emerald-800"
+                            : shouldHighlightWrongSelection
+                              ? "border-rose-400 bg-rose-50 text-rose-800"
+                              : "border-slate-200 text-slate-700 hover:border-indigo-300 hover:bg-indigo-50"
                       }`}
                     >
                       {option}
@@ -982,9 +989,7 @@ function GamePage() {
                 {"Kết thúc ca làm"}
               </h2>
               <p className="mt-3 text-base text-slate-600 sm:text-lg">
-                {
-                  "Ca làm đã kết thúc sau khi hoàn thành đủ 8 câu hỏi. Bạn có thể bắt đầu ca mới bất kỳ lúc nào."
-                }
+                {`Ca làm đã kết thúc sau khi hoàn thành đủ ${SHIFT_QUESTION_LIMIT} câu hỏi. Bạn có thể bắt đầu ca mới bất kỳ lúc nào.`}
               </p>
 
               <div className="mx-auto mt-6 grid max-w-3xl gap-4 sm:grid-cols-2">
