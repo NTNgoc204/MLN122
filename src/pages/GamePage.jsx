@@ -645,7 +645,7 @@ function GamePage() {
               : "text-4xl font-semibold text-slate-800 sm:text-5xl"
           }
         >
-          {"Ai giữ tiền?"}
+          {"Bạn thật sự giữ được bao nhiêu?"}
         </h1>
         {!isShiftRunning && (
           <p className="mx-auto mt-2 max-w-3xl text-lg text-slate-600 sm:text-xl">
@@ -828,11 +828,11 @@ function GamePage() {
           {!gameStarted && (
             <section className="text-center">
               <h2 className="text-2xl font-semibold text-slate-800 sm:text-3xl">
-                {"Bạn là người lao động trong nền kinh tế số"}
+                {"Bạn là tài xế công nghệ Grab"}
               </h2>
               <p className="mx-auto mt-3 max-w-2xl text-base leading-relaxed text-slate-600 sm:text-lg">
                 {
-                  "Mỗi ca gồm 8 câu hỏi. Bạn cần hoàn thành đủ 8 câu thì ca mới kết thúc và tổng kết dòng tiền."
+                  "Hãy giúp bác tài hoàn thành ca làm và kiếm thu nhập bằng cách trả lời các câu hỏi sau."
                 }
               </p>
               <button
