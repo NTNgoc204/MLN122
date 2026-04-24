@@ -7,6 +7,9 @@ export const theorySections = [
     icon: BrainCircuit,
     iconTone: "bg-emerald-100 text-emerald-700",
     glow: "from-emerald-400/20 via-transparent to-transparent",
+    usePopup: true,
+    preview:
+      "Giải thích nguồn gốc giá trị thặng dư từ vận động tiền tệ thành tư bản.",
   },
   {
     id: "02",
@@ -22,6 +25,9 @@ export const theorySections = [
     icon: BarChart3,
     iconTone: "bg-blue-100 text-blue-700",
     glow: "from-blue-400/20 via-transparent to-transparent",
+    usePopup: true,
+    preview:
+      "Tóm tắt các hình thức biểu hiện của giá trị thặng dư trong kinh tế thị trường.",
   },
   {
     id: "04",
@@ -29,6 +35,9 @@ export const theorySections = [
     icon: Cpu,
     iconTone: "bg-indigo-100 text-indigo-700",
     glow: "from-indigo-400/20 via-transparent to-transparent",
+    usePopup: true,
+    preview:
+      "Mô phỏng cách giá trị thặng dư vận hành trong nền kinh tế số.",
   },
 ];
 
