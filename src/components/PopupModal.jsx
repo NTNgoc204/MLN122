@@ -1,4 +1,5 @@
 import { useEffect } from 'react'
+import { createPortal } from 'react-dom'
 
 function PopupModal({ isOpen, onClose, title, children }) {
   useEffect(() => {
@@ -26,9 +27,9 @@ function PopupModal({ isOpen, onClose, title, children }) {
     return null
   }
 
-  return (
+  return createPortal(
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/55 px-3 py-8 backdrop-blur-sm"
+      className="fixed inset-0 z-[1000] flex items-center justify-center bg-slate-950/55 px-3 py-8 backdrop-blur-sm"
       onClick={onClose}
       role="presentation"
     >
@@ -53,7 +54,8 @@ function PopupModal({ isOpen, onClose, title, children }) {
 
         <div className="max-h-[75vh] overflow-y-auto px-5 py-5 sm:px-7 sm:py-6">{children}</div>
       </section>
-    </div>
+    </div>,
+    document.body
   )
 }
 
