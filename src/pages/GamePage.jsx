@@ -411,6 +411,37 @@ const QUESTION_POOL = [
   },
 ];
 
+const diversifyQuestionPool = (pool) =>
+  pool.map((question, questionIndex) => {
+    const optionCount = question.options.length;
+
+    if (optionCount === 0) {
+      return question;
+    }
+
+    const safeCorrectIndex = Math.min(
+      Math.max(question.correctIndex, 0),
+      optionCount - 1,
+    );
+    const targetIndex = questionIndex % optionCount;
+
+    if (safeCorrectIndex === targetIndex) {
+      return question;
+    }
+
+    const diversifiedOptions = [...question.options];
+    const [correctOption] = diversifiedOptions.splice(safeCorrectIndex, 1);
+    diversifiedOptions.splice(targetIndex, 0, correctOption);
+
+    return {
+      ...question,
+      options: diversifiedOptions,
+      correctIndex: targetIndex,
+    };
+  });
+
+const DIVERSIFIED_QUESTION_POOL = diversifyQuestionPool(QUESTION_POOL);
+
 const INITIAL_COMPANY_MONEY = 0;
 const ROUND_CREATED_VALUE = 30;
 const COMPANY_RATE = 0.3;
@@ -518,7 +549,7 @@ function GamePage() {
   const startGame = () => {
     setGameStarted(true);
     setShiftEnded(false);
-    setQuestionSet(shuffleQuestions(QUESTION_POOL));
+    setQuestionSet(shuffleQuestions(DIVERSIFIED_QUESTION_POOL));
     setCurrentIndex(0);
     setTotalAnswered(0);
     setCompanyMoney(INITIAL_COMPANY_MONEY);
@@ -618,7 +649,7 @@ function GamePage() {
       const nextIndex = prev + 1;
 
       if (nextIndex >= questionSet.length) {
-        setQuestionSet(shuffleQuestions(QUESTION_POOL));
+        setQuestionSet(shuffleQuestions(DIVERSIFIED_QUESTION_POOL));
         return 0;
       }
 
